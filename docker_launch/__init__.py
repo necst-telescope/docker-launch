@@ -5,5 +5,5 @@ except ImportError:
 
 try:
     __version__ = version("docker-launch")
-except:
+except:  # noqa: E722
     __version__ = "0.0.0"
