@@ -4,6 +4,6 @@ except ImportError:
     from importlib_metadata import version
 
 try:
-    __version__ = version("package-name")
+    __version__ = version("docker-launch")
 except:
     __version__ = "0.0.0"
