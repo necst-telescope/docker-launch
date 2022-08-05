@@ -1,15 +1,15 @@
 [tool.poetry]
-name = "package-name"
+name = "docker-launch"
 version = "0.1.0"
-description = "TEMPLATE"
+description = "Create and launch docker images on multiple hosts."
 license = "MIT"
 readme = "README.md"
 authors = ["KaoruNishikawa <k.nishikawa@a.phys.nagoya-u.ac.jp>"]
-homepage = "https://github.com/necst-telescope/Package-Name"
-repository = "https://github.com/necst-telescope/Package-Name"
+homepage = "https://github.com/necst-telescope/docker-launch"
+repository = "https://github.com/necst-telescope/docker-launch"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 importlib-metadata = { version = "^4.4", python = "<3.8" }
 numpy = "^1.19"
 
