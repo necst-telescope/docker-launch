@@ -1,4 +1,4 @@
-import package_name  # noqa: F401
+import docker_launch  # noqa: F401
 
 
 def test_nothing():

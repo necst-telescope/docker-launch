@@ -1,29 +1,27 @@
-# Package-Name
+# docker-launch
 
-[![PyPI](https://img.shields.io/pypi/v/package-name.svg?label=PyPI&style=flat-square)](https://pypi.org/pypi/package-name/)
-[![Python](https://img.shields.io/pypi/pyversions/package-name.svg?label=Python&color=yellow&style=flat-square)](https://pypi.org/pypi/package-name/)
-[![Test](https://img.shields.io/github/workflow/status/necst-telescope/Package-Name/Test?logo=github&label=Test&style=flat-square)](https://github.com/necst-telescope/Package-Name/actions)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg?label=License&style=flat-square)](https://github.com/necst-telescope/Package-Name/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/docker-launch.svg?label=PyPI&style=flat-square)](https://pypi.org/pypi/docker-launch/)
+[![Python](https://img.shields.io/pypi/pyversions/docker-launch.svg?label=Python&color=yellow&style=flat-square)](https://pypi.org/pypi/docker-launch/)
+[![Test](https://img.shields.io/github/workflow/status/necst-telescope/docker-launch/Test?logo=github&label=Test&style=flat-square)](https://github.com/necst-telescope/docker-launch/actions)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?label=License&style=flat-square)](https://github.com/necst-telescope/docker-launch/blob/main/LICENSE)
 
-Python package template.
+Create and launch docker images on multiple hosts.
 
 ## Features
 
 This library provides:
 
-- something.
+- TBU
 
 ## Installation
 
 ```shell
-pip install package-name
+pip install docker-launch
 ```
 
 ## Usage
 
-### 1st module
-
-### 2nd module
+TBU
 
 ---
 

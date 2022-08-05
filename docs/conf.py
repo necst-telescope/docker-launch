@@ -1,12 +1,12 @@
-import package_name
+import docker_launch
 
 
 # -- Project information -----------------------------------------------------
 
-project = "Package-Name"
+project = "docker-launch"
 copyright = "2022, NECST Developers"
 author = "NECST Developers"
-release = version = package_name.__version__
+release = version = docker_launch.__version__
 
 # -- General configuration ---------------------------------------------------
 
@@ -35,13 +35,13 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/necst-telescope/Package-Name",
+            "url": "https://github.com/necst-telescope/docker-launch",
             "icon": "fab fa-github-square",
             "type": "fontawesome",
         },
         {
             "name": "PyPI",
-            "url": "https://pypi.org/project/package-name/",
+            "url": "https://pypi.org/project/docker-launch/",
             "icon": "fas fa-cubes",
             "type": "fontawesome",
         },
