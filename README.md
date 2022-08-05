@@ -9,9 +9,6 @@ Create and launch docker images on multiple hosts.
 
 ## Features
 
-This library provides:
-
-- TBU
 
 ## Installation
 
