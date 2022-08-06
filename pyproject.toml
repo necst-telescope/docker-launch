@@ -13,6 +13,7 @@ check = "docker_launch.ssh:interactively_check_ssh_key"
 
 [tool.poetry.dependencies]
 python = "^3.7"
+docker = "^5.0.3"
 importlib-metadata = { version = "^4.4", python = "<3.8" }
 paramiko = "^2.11.0"
 
