@@ -7,3 +7,6 @@ try:
     __version__ = version("docker-launch")
 except:  # noqa: E722
     __version__ = "0.0.0"
+
+# Aliases
+from .ssh import check_key_ssh  # noqa: F401
