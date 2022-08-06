@@ -1,3 +1,6 @@
+include = []
+single_image_per_machine = false
+
 [ros_executors]
 baseimg = "ros:humble-ros-base"
 command = "ros2 run {executor}"
@@ -5,4 +8,13 @@ targets = [
     { executor = "run-some-nodes.exec.py", __machine__ = "localhost" },
     { executor = "run-other-nodes.exec.py", __machine__ = "192.168.1.2" },
     { executor = "run-other-nodes.exec.py" },
+]
+
+[ros_nodes]
+baseimg = "ros:foxy-ros-base"
+command = "ros2 run {node}"
+targets = [
+    { node = "some_node.py", __machine__ = "localhost" },
+    { node = "other_node.py", __machine__ = "192.168.1.2" },
+    { node = "unknown_node.py" },
 ]
