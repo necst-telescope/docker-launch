@@ -1,12 +1,13 @@
 import os
 from collections import defaultdict
-from typing import Any, Dict, Hashable, List, Union
+from typing import Any, Dict, Hashable, List, Literal, Union
 
 from tomlkit.toml_file import TOMLFile
 
 
 Substitution = Dict[str, str]
 Object = Dict[Hashable, Any]
+LaunchConfiguration = Dict[Literal["image", "cmd", "machine"], str]
 
 
 def _substitute_command(
@@ -26,7 +27,7 @@ def _groupby(objects: List[Object], key: Hashable) -> Dict[str, List[Object]]:
     return grouped
 
 
-def parse(config_path: os.PathLike):
+def parse(config_path: os.PathLike) -> Dict[Hashable, List[LaunchConfiguration]]:
     config = TOMLFile(config_path).read()
 
     additional_config_files = config.pop("include", [])
