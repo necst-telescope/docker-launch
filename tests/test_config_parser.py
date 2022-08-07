@@ -55,11 +55,11 @@ class TestParse:
                     "machine": "localhost",
                 }
             ],
-            "user@192.168.1.2": [
+            "user@172.29.1.2": [
                 {
                     "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
-                    "machine": "user@192.168.1.2",
+                    "machine": "user@172.29.1.2",
                 }
             ],
             None: [
@@ -85,16 +85,16 @@ class TestParse:
                     "machine": "localhost",
                 },
             ],
-            "user@192.168.1.2": [
+            "user@172.29.1.2": [
                 {
                     "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
-                    "machine": "user@192.168.1.2",
+                    "machine": "user@172.29.1.2",
                 },
                 {
                     "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run other_node.py",
-                    "machine": "user@192.168.1.2",
+                    "machine": "user@172.29.1.2",
                 },
             ],
             None: [
@@ -125,16 +125,16 @@ class TestParse:
                     "machine": "localhost",
                 },
             ],
-            "user@192.168.1.2": [
+            "user@172.29.1.2": [
                 {
                     "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
-                    "machine": "user@192.168.1.2",
+                    "machine": "user@172.29.1.2",
                 },
                 {
                     "image": "ros:foxy-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run other_node.py",
-                    "machine": "user@192.168.1.2",
+                    "machine": "user@172.29.1.2",
                 },
             ],
             None: [
