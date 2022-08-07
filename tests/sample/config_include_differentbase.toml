@@ -6,6 +6,6 @@ baseimg = "ros:foxy-ros-base"
 command = "ros2 run {node}"
 targets = [
     { node = "some_node.py", __machine__ = "localhost" },
-    { node = "other_node.py", __machine__ = "192.168.1.2" },
+    { node = "other_node.py", __machine__ = "user@192.168.1.2" },
     { node = "unknown_node.py" },
 ]

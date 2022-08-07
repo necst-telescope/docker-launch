@@ -4,12 +4,14 @@ from typing import List
 import docker
 
 from .config_parser import parse
+from .ssh import _parse_address
 from .typing import PathLike
 
 
 def _is_ip_address(address: str) -> bool:
     try:
-        ip_address(address)
+        ip_addr, _ = _parse_address(address)
+        ip_address(ip_addr)
         return True
     except ValueError:
         return False

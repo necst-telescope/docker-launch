@@ -3,6 +3,6 @@ baseimg = "ros:humble-ros-base"
 command = "ros2 run {executor}"
 targets = [
     { executor = "run-some-nodes.exec.py", __machine__ = "localhost" },
-    { executor = "run-other-nodes.exec.py", __machine__ = "192.168.1.2" },
+    { executor = "run-other-nodes.exec.py", __machine__ = "user@192.168.1.2" },
     { executor = "run-other-nodes.exec.py" },
 ]

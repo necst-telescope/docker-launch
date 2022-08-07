@@ -6,6 +6,6 @@ baseimg = "ros:humble-ros-base"
 command = "ros2 run {1}"
 targets = [
     { 1 = "some_node.py", __machine__ = "localhost" },
-    { 1 = "other_node.py", __machine__ = "192.168.1.2" },
+    { 1 = "other_node.py", __machine__ = "user@192.168.1.2" },
     { 1 = "unknown_node.py" },
 ]
