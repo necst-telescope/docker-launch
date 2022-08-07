@@ -1,8 +1,10 @@
 import os
 from collections import defaultdict
-from typing import Any, Dict, Hashable, List, Literal, Union
+from typing import Any, Dict, Hashable, List, Union
 
 from tomlkit.toml_file import TOMLFile
+
+from .typing import Literal
 
 
 Substitution = Dict[str, str]

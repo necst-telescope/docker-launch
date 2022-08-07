@@ -17,6 +17,7 @@ docker = "^5.0.3"
 importlib-metadata = { version = "^4.4", python = "<3.8" }
 paramiko = "^2.11.0"
 tomlkit = "^0.11.1"
+typing-extensions = { version = "^4.3", python = "<3.8" }
 
 [tool.poetry.dev-dependencies]
 black = "^22.3"
