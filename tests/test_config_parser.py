@@ -1,13 +1,6 @@
-from pathlib import Path
-
 import pytest
 
 from docker_launch.config_parser import _substitute_command, _groupby, parse
-
-
-@pytest.fixture
-def sample_dir():
-    return Path(__file__).parent / "sample"
 
 
 def test__substitute_command():
@@ -57,21 +50,21 @@ class TestParse:
         assert parse(sample_dir / "config.toml") == {
             "localhost": [
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-some-nodes.exec.py",
                     "machine": "localhost",
                 }
             ],
             "user@192.168.1.2": [
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
                     "machine": "user@192.168.1.2",
                 }
             ],
             None: [
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
                     "machine": None,
                 }
@@ -82,36 +75,36 @@ class TestParse:
         assert parse(sample_dir / "config_multiple_samebase.toml") == {
             "localhost": [
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-some-nodes.exec.py",
                     "machine": "localhost",
                 },
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run some_node.py",
                     "machine": "localhost",
                 },
             ],
             "user@192.168.1.2": [
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
                     "machine": "user@192.168.1.2",
                 },
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run other_node.py",
                     "machine": "user@192.168.1.2",
                 },
             ],
             None: [
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
                     "machine": None,
                 },
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run unknown_node.py",
                     "machine": None,
                 },
@@ -122,36 +115,36 @@ class TestParse:
         assert parse(sample_dir / "config_multiple_differentbase.toml") == {
             "localhost": [
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-some-nodes.exec.py",
                     "machine": "localhost",
                 },
                 {
-                    "image": "ros:foxy-ros-base",
+                    "image": "ros:foxy-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run some_node.py",
                     "machine": "localhost",
                 },
             ],
             "user@192.168.1.2": [
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
                     "machine": "user@192.168.1.2",
                 },
                 {
-                    "image": "ros:foxy-ros-base",
+                    "image": "ros:foxy-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run other_node.py",
                     "machine": "user@192.168.1.2",
                 },
             ],
             None: [
                 {
-                    "image": "ros:humble-ros-base",
+                    "image": "ros:humble-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
                     "machine": None,
                 },
                 {
-                    "image": "ros:foxy-ros-base",
+                    "image": "ros:foxy-ros-core",
                     "cmd": "env ROS_DOMAIN_ID=1 ros2 run unknown_node.py",
                     "machine": None,
                 },

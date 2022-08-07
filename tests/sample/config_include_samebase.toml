@@ -2,7 +2,7 @@ include = [ "config.toml" ]
 single_image_per_machine = false
 
 [ros_nodes]
-baseimg = "ros:humble-ros-base"
+baseimg = "ros:humble-ros-core"
 command = "env ROS_DOMAIN_ID=1 ros2 run {1}"
 targets = [
     { 1 = "some_node.py", __machine__ = "localhost" },
