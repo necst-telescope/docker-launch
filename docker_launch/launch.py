@@ -9,6 +9,9 @@ from .typing import PathLike
 
 
 def _is_ip_address(address: str) -> bool:
+    if not isinstance(address, str):
+        return False
+
     try:
         ip_addr, _ = _parse_address(address)
         ip_address(ip_addr)
@@ -28,26 +31,37 @@ def _resolve_base_url(machine: str = None) -> str:
     raise ValueError(f"Cannot interpret machine specification : '{machine}'")
 
 
-def _start_containers(
-    config_path: PathLike, **kwargs
-) -> List[docker.models.containers.Container]:
-    config = parse(config_path)
+class Containers:
+    def __init__(self, config_path: PathLike) -> None:
+        self.config_path = config_path
 
-    containers = {}
-    for machine, conf in config.items():
-        daemon_url = _resolve_base_url(machine)
-        client = docker.DockerClient(base_url=daemon_url)
+    def start(self, **kwargs) -> List[docker.models.containers.Container]:
+        config = parse(self.config_path)
 
-        img_and_cmd = list(map(lambda x: (x["image"], x["cmd"]), conf))
-        _containers = [
-            client.containers.run(image, command, detach=True, **kwargs)
-            for image, command in img_and_cmd
-        ]  # TODO: Possibly multi-thread?
-        containers[machine] = _containers
-    return containers
+        containers = {}
+        for machine, conf in config.items():
+            daemon_url = _resolve_base_url(machine)
+            client = docker.DockerClient(base_url=daemon_url)
+
+            img_and_cmd = list(map(lambda x: (x["image"], x["cmd"]), conf))
+            _containers = [
+                client.containers.run(image, command, detach=True, **kwargs)
+                for image, command in img_and_cmd
+            ]  # TODO: Possibly multi-thread?
+            containers[machine] = _containers
+        return containers
+
+    def stop(self):
+        raise NotImplementedError
+
+    def ping(self):
+        raise NotImplementedError
+
+    @classmethod
+    def launch(
+        cls, config_path: PathLike, **kwargs
+    ) -> List[docker.models.containers.Container]:
+        return cls(config_path).start(**kwargs)
 
 
-def launch_containers(config_path: PathLike, **kwargs) -> None:
-    containers = _start_containers(config_path, **kwargs)
-    # TODO: Manage started containers' status
-    return containers
+launch_containers = Containers.launch
