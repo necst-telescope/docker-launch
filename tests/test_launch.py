@@ -3,7 +3,7 @@ import pytest
 from docker_launch import launch_containers, check_docker_available  # noqa: F401
 from docker_launch.launch import _is_ip_address, _resolve_base_url, Containers
 
-DOCKER_NOT_AVAILABLE = check_docker_available()
+DOCKER_NOT_AVAILABLE = not check_docker_available()
 
 
 def test__is_ip_address():
@@ -16,7 +16,7 @@ def test__is_ip_address():
 def test__resolve_base_url():
     assert _resolve_base_url("host") is None
     assert _resolve_base_url("localhost") is None
-    assert _resolve_base_url(None) is None  # TODO: Not fixed yet
+    assert _resolve_base_url(None) is None  # TODO: May change
     assert _resolve_base_url("user@192.168.1.1") == "ssh://user@192.168.1.1"
     assert _resolve_base_url("192.168.1.1") == "ssh://192.168.1.1"
 
