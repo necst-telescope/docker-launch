@@ -43,7 +43,7 @@ def _start_containers(
             client.containers.run(image, command, detach=True, **kwargs)
             for image, command in img_and_cmd
         ]  # TODO: Possibly multi-thread?
-        containers[machine] = {"client": client, "container": _containers}
+        containers[machine] = _containers
     return containers
 
 
