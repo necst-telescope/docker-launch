@@ -1,6 +1,6 @@
 [ros_executors]
 baseimg = "ros:humble-ros-base"
-command = "ros2 run {executor}"
+command = "env ROS_DOMAIN_ID=1 ros2 run {executor}"
 targets = [
     { executor = "run-some-nodes.exec.py", __machine__ = "localhost" },
     { executor = "run-other-nodes.exec.py", __machine__ = "user@192.168.1.2" },

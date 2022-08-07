@@ -3,7 +3,7 @@ single_image_per_machine = false
 
 [ros_nodes]
 baseimg = "ros:humble-ros-base"
-command = "ros2 run {1}"
+command = "env ROS_DOMAIN_ID=1 ros2 run {1}"
 targets = [
     { 1 = "some_node.py", __machine__ = "localhost" },
     { 1 = "other_node.py", __machine__ = "user@192.168.1.2" },
