@@ -33,7 +33,7 @@ def _start_containers(
 ) -> List[docker.models.containers.Container]:
     config = parse(config_path)
 
-    containers = []
+    containers = {}
     for machine, conf in config.items():
         daemon_url = _resolve_base_url(machine)
         client = docker.DockerClient(base_url=daemon_url)
@@ -43,7 +43,7 @@ def _start_containers(
             client.containers.run(image, command, detach=True, **kwargs)
             for image, command in img_and_cmd
         ]  # TODO: Possibly multi-thread?
-        containers.append(_containers)
+        containers[machine] = {"client": client, "container": _containers}
     return containers
 
 
