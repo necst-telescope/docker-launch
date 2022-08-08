@@ -3,18 +3,18 @@ single_image_per_machine = false
 
 [ros_executors]
 baseimg = "ros:humble-ros-core"
-command = "env ROS_DOMAIN_ID=1 ros2 run {executor}"
+command = "env ROS_DOMAIN_ID=1 ros2 topic pub {a} std_msgs/msg/Float64 '{{data: 123.45}}'"
 targets = [
-    { executor = "run-some-nodes.exec.py", __machine__ = "localhost" },
-    { executor = "run-other-nodes.exec.py", __machine__ = "user@172.29.1.2" },
-    { executor = "run-other-nodes.exec.py" },
+    { a = "first", __machine__ = "localhost" },
+    { a = "/second", __machine__ = "user@172.29.1.2" },
+    { a = "third" },
 ]
 
 [ros_nodes]
 baseimg = "ros:humble-ros-core"
-command = "env ROS_DOMAIN_ID=1 ros2 run {node}"
+command = "env ROS_DOMAIN_ID=1 ros2 topic pub {topic} std_msgs/msg/Float64 '{{data: 123.45}}'"
 targets = [
-    { node = "some_node.py", __machine__ = "localhost" },
-    { node = "other_node.py", __machine__ = "user@172.29.1.2" },
-    { node = "unknown_node.py" },
+    { topic = "first", __machine__ = "localhost" },
+    { topic = "/second", __machine__ = "user@172.29.1.2" },
+    { topic = "third" },
 ]

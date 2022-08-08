@@ -3,9 +3,9 @@ single_image_per_machine = false
 
 [ros_nodes]
 baseimg = "ros:humble-ros-core"
-command = "env ROS_DOMAIN_ID=1 ros2 run {1}"
+command = "env ROS_DOMAIN_ID=1 ros2 topic pub {topic} std_msgs/msg/Float64 '{{data: 123.45}}'"
 targets = [
-    { 1 = "some_node.py", __machine__ = "localhost" },
-    { 1 = "other_node.py", __machine__ = "user@172.29.1.2" },
-    { 1 = "unknown_node.py" },
+    { topic = "first", __machine__ = "localhost" },
+    { topic = "/second", __machine__ = "user@172.29.1.2" },
+    { topic = "third" },
 ]
