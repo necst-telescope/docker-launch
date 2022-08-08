@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import patch
 
 import paramiko
 import pytest
@@ -15,14 +15,16 @@ def test__parse_address():
         _parse_address("user@172.29.1.1", "me")
 
 
-def test_check_key_ssh():
-    def _mock_connect(addr, *, username, port):
-        if (addr == "172.29.0.1") and (username == "me") and (port == 22):
-            return
-        else:
-            raise paramiko.AuthenticationException
+def _mock_connect(self, addr, *, username, port):
+    if (addr == "172.29.0.1") and (username == "me") and (port == 22):
+        return
+    else:
+        raise paramiko.AuthenticationException
 
-    paramiko.SSHClient.connect = Mock(side_effect=_mock_connect)
+
+@patch("paramiko.SSHClient.connect", _mock_connect)
+def test_check_key_ssh():
+    # paramiko.SSHClient.connect = Mock(side_effect=_mock_connect)
 
     assert check_key_ssh("me@172.29.0.1") is True
     assert check_key_ssh("172.29.0.1", username="me") is True
