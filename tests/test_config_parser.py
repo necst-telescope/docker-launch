@@ -51,21 +51,21 @@ class TestParse:
             "localhost": [
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-some-nodes.exec.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub first std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": "localhost",
                 }
             ],
             "user@172.29.1.2": [
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub /second std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": "user@172.29.1.2",
                 }
             ],
             None: [
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub third std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": None,
                 }
             ],
@@ -76,36 +76,36 @@ class TestParse:
             "localhost": [
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-some-nodes.exec.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub first std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": "localhost",
                 },
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run some_node.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub first std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": "localhost",
                 },
             ],
             "user@172.29.1.2": [
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub /second std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": "user@172.29.1.2",
                 },
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run other_node.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub /second std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": "user@172.29.1.2",
                 },
             ],
             None: [
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub third std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": None,
                 },
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run unknown_node.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub third std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": None,
                 },
             ],
@@ -116,36 +116,36 @@ class TestParse:
             "localhost": [
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-some-nodes.exec.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub first std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": "localhost",
                 },
                 {
                     "image": "ros:foxy-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run some_node.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub first std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": "localhost",
                 },
             ],
             "user@172.29.1.2": [
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub /second std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": "user@172.29.1.2",
                 },
                 {
                     "image": "ros:foxy-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run other_node.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub /second std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": "user@172.29.1.2",
                 },
             ],
             None: [
                 {
                     "image": "ros:humble-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run run-other-nodes.exec.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub third std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": None,
                 },
                 {
                     "image": "ros:foxy-ros-core",
-                    "cmd": "env ROS_DOMAIN_ID=1 ros2 run unknown_node.py",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub third std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
                     "machine": None,
                 },
             ],
