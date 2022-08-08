@@ -1,6 +1,9 @@
+from unittest.mock import patch
+
+import docker
 import pytest
 
-from docker_launch import launch_containers, check_docker_available  # noqa: F401
+from docker_launch import launch_containers, check_docker_available
 from docker_launch.launch import _is_ip_address, _resolve_base_url, Containers
 
 DOCKER_NOT_AVAILABLE = not check_docker_available()
@@ -25,14 +28,29 @@ config_file_names = pytest.mark.parametrize(
     "config_file_name",
     [
         "config.toml",
-        "config_include_differentbase.toml",
-        "config_include_samebase.toml",
+        pytest.param(
+            "config_include_differentbase.toml",
+            marks=pytest.mark.xfail(reason="Not implemented yet."),
+        ),
+        pytest.param(
+            "config_include_samebase.toml",
+            marks=pytest.mark.xfail(reason="Not implemented yet."),
+        ),
         "config_multiple_differentbase.toml",
         "config_multiple_samebase.toml",
     ],
 )
 
 
+OriginalDockerClient = docker.DockerClient
+
+
+def LocalhostDockerClient(base_url=None, **kwargs):
+    kwargs.update({"base_url": None})
+    return OriginalDockerClient(**kwargs)
+
+
+@patch("docker.DockerClient", LocalhostDockerClient)
 @pytest.mark.skipif(
     DOCKER_NOT_AVAILABLE, reason="Docker isn't available in this environment."
 )
@@ -40,7 +58,13 @@ class TestContainers:
     @config_file_names
     def test_start(self, sample_dir, config_file_name):
         c = Containers(sample_dir / config_file_name)
-        c.start(remove=True)
+        started = c.start(remove=True)
+        print(c, started)
+        for group in started.values():
+            for container in group:
+                container.reload()
+                assert container.status == "running"
+                container.stop()
 
     @config_file_names
     @pytest.mark.skip(reason="Not implemented yet.")
@@ -53,9 +77,8 @@ class TestContainers:
         _ = Containers(sample_dir / config_file_name)
 
 
+@patch("docker.DockerClient", LocalhostDockerClient)
 @config_file_names
-@pytest.mark.skipif(
-    DOCKER_NOT_AVAILABLE, reason="Docker isn't available in this environment."
-)
+@pytest.mark.skip(reason="Not implemented yet.")
 def test_launch_containers(sample_dir, config_file_name):
-    _ = launch_containers(sample_dir / config_file_name, remove=True, network="host")
+    _ = launch_containers(sample_dir / config_file_name, remove=True)
