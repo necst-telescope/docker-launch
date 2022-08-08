@@ -1,7 +1,7 @@
 include = [ "config.toml" ]
 single_image_per_machine = false
 
-[ros_nodes]
+[ros_topics]
 baseimg = "ros:humble-ros-core"
 command = "env ROS_DOMAIN_ID=1 ros2 topic pub {topic} std_msgs/msg/Float64 '{{data: 123.45}}'"
 targets = [
