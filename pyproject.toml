@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "docker-launch"
 version = "0.1.0"
-description = "Create and launch docker images on multiple hosts."
+description = "Create and launch docker containers on multiple hosts."
 license = "MIT"
 readme = "README.md"
 authors = ["KaoruNishikawa <k.nishikawa@a.phys.nagoya-u.ac.jp>"]
@@ -9,10 +9,11 @@ homepage = "https://github.com/necst-telescope/docker-launch"
 repository = "https://github.com/necst-telescope/docker-launch"
 
 [tool.poetry.scripts]
-check = "docker_launch.ssh:interactively_check_ssh_key"
+docker-launch = "docker_launch.console:main"
 
 [tool.poetry.dependencies]
 python = "^3.7"
+cleo = "^0.8.1"
 docker = "^5.0.3"
 importlib-metadata = { version = "^4.4", python = "<3.8" }
 paramiko = "^2.11.0"
