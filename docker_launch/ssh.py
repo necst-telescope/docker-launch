@@ -2,6 +2,8 @@ from typing import Tuple
 
 import paramiko
 
+from docker_launch import logger
+
 
 def _parse_address(address: str, username: str = None) -> Tuple[str, str]:
     """Parse IP address, either in format user@ipaddr or separately provided.
@@ -34,17 +36,21 @@ def _parse_address(address: str, username: str = None) -> Tuple[str, str]:
     return (ipaddr, _username)
 
 
-def check_key_ssh(address: str, *, username: str = None, port: int = 22) -> bool:
+def check_connection(
+    address: str, *, username: str = None, port: int = 22, timeout=3
+) -> bool:
     client = paramiko.SSHClient()
     client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
     ipaddr, username = _parse_address(address, username)
     try:
-        client.connect(ipaddr, username=username, port=port)
+        client.connect(ipaddr, username=username, port=port, timeout=timeout)
         client.close()
         return True
-    except paramiko.AuthenticationException:
+    except Exception as e:
+        logger.error(
+            f"Cannot establish SSH connection with '{username}@{ipaddr}', "
+            f"got {e.__class__}.\nUse ``docker-launch check`` to debug this."
+        )
         return False
-
-
-def interactively_check_key_ssh():
-    raise NotImplementedError
