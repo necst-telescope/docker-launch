@@ -1,12 +1,12 @@
 import logging
 import subprocess
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Type
 
 import paramiko
 from cleo import Command
 
-from ..ssh import check_connection, _parse_address
+from ..ssh import check_connection, _get_ssh_client, _parse_address
 from ..typing import PathLike
 
 
@@ -37,11 +37,11 @@ class CheckCommand(Command):
             )
             return 1
 
-        private_key_path = self._get_default_private_key_paths()
+        private_key_path = self._get_default_private_key_path()
         if private_key_path is None:
             # TODO: Check when only one of (id_rsa, id_rsa.pub) exists, raise error?
             private_key_path = self._generate_default_key()
-            self.info(f"Default private key '{private_key_path}' generated.")
+            self.info(f"Default key '{private_key_path}' generated.")
         else:
             self.info(f"Default key '{private_key_path}' found.")
 
@@ -53,6 +53,15 @@ class CheckCommand(Command):
                 self.info("Connection established!")
                 return 0
             else:
+                if self._get_ssh_error(address) is paramiko.BadHostKeyException:
+                    ipaddr, _ = _parse_address(address)
+                    self.line_error(
+                        f"{address} looks different from what this machine knows it is."
+                    )
+                    self.line(
+                        f"If you know why this happens (e.g. machine at {address} is "
+                        f"replaced), run <comment>ssh keygen -R {ipaddr}</> and retry."
+                    )
                 self.line_error("Connection failed.", "error")
                 if self._check_if_key_is_locked(private_key_path):
                     self.info("This error may originates from locked key.\n")
@@ -62,8 +71,8 @@ class CheckCommand(Command):
                         "because Docker doesn't handle passphrase.\n"
                         "In shells with no 'SSH_AUTH_SOCK' and 'SSH_AGENT_PID' "
                         "variables set (e.g. shell over SSH), the agent cannot be "
-                        "accessed, so need configuration every time you log-in to the "
-                        "shell."
+                        "accessed, so need configuration of the agent every time you "
+                        "log-in to the shell, which this command doesn't support."
                     )
                     return 2
                 return 3
@@ -113,3 +122,16 @@ class CheckCommand(Command):
 
         self.line(f"New RSA key <info>'{private_key_path}'</> generated.")
         return private_key_path
+
+    def _get_ssh_error(
+        self, address: str, *, username: str = None, port: int = 22, timeout: float = 3
+    ) -> Optional[Type[Exception]]:
+        ipaddr, username = _parse_address(address, username)
+
+        client = _get_ssh_client()
+        try:
+            client.connect(ipaddr, port=port, username=username, timeout=timeout)
+            client.close()
+            return
+        except Exception as e:
+            return e.__class__

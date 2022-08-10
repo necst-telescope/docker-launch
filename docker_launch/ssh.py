@@ -36,12 +36,21 @@ def _parse_address(address: str, username: str = None) -> Tuple[str, str]:
     return (ipaddr, _username)
 
 
-def check_connection(
-    address: str, *, username: str = None, port: int = 22, timeout=3
-) -> bool:
+def _get_ssh_client() -> paramiko.SSHClient:
     client = paramiko.SSHClient()
-    client.load_system_host_keys()
+    try:
+        client.load_system_host_keys()
+    except UnicodeDecodeError:
+        logger.warning("Host key file found, but it may be corrupted.")
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    return client
+
+
+def check_connection(
+    address: str, *, username: str = None, port: int = 22, timeout: float = 3
+) -> bool:
+    client = _get_ssh_client()
 
     ipaddr, username = _parse_address(address, username)
     try:
