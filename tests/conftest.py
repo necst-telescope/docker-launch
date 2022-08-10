@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from cleo import Application, CommandTester
@@ -16,8 +17,8 @@ def sample_dir():
 @pytest.fixture
 def app():
     _app = Application()
-    _app.add(CheckCommand)
-    # _app.add(UpCommand)
+    _app.add(CheckCommand())
+    # _app.add(UpCommand())
     return _app
 
 
@@ -30,17 +31,30 @@ def command_tester_factory(app):
     return create_tester
 
 
-def connect(self, hostname, port=22, username=None, **kwargs) -> None:
-    import paramiko
+@pytest.fixture
+def mock_ssh_connection():
+    def connect(self, hostname, port=22, username=None, **kwargs) -> None:
+        import paramiko
 
-    if (hostname, username, port) == ("172.29.0.1", "me", 22):
-        return
-    else:
-        raise paramiko.AuthenticationException
+        if (hostname, username, port) == ("172.29.0.1", "user", 22):
+            return
+        if port == 22:
+            raise paramiko.AuthenticationException
+        if username == "user":
+            raise paramiko.BadHostKeyException
+        raise paramiko.SSHException
+
+    with patch("paramiko.SSHClient.connect", connect):
+        yield
 
 
-def LocalhostDockerClient(**kwargs):
-    from docker import DockerClient
+@pytest.fixture
+def mock_docker_client():
+    def LocalhostDockerClient(**kwargs):
+        from docker import DockerClient
 
-    kwargs.update({"base_url": None})
-    return DockerClient(**kwargs)
+        kwargs.update({"base_url": None})
+        return DockerClient(**kwargs)
+
+    with patch("docker.DockerClient", LocalhostDockerClient):
+        yield
