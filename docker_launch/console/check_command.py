@@ -50,7 +50,7 @@ class CheckCommand(Command):
         if ret == 0:
             self.info(f"Successfully copied public key to remote host '{address}'.")
             if check_connection(address):
-                self.info("Connection established!")
+                self.info("Connection OK!")
                 return 0
             else:
                 if self._get_ssh_error(address) is paramiko.BadHostKeyException:
@@ -62,6 +62,7 @@ class CheckCommand(Command):
                         f"If you know why this happens (e.g. machine at {address} is "
                         f"replaced), run <comment>ssh keygen -R {ipaddr}</> and retry."
                     )
+                    return 2
                 self.line_error("Connection failed.", "error")
                 if self._check_if_key_is_locked(private_key_path):
                     self.info("This error may originates from locked key.\n")
@@ -74,8 +75,8 @@ class CheckCommand(Command):
                         "accessed, so need configuration of the agent every time you "
                         "log-in to the shell, which this command doesn't support."
                     )
-                    return 2
-                return 3
+                    return 3
+                return 4
 
         self.line_error(
             f"Couldn't copy public key to remote host '{address}'.\n", "error"
