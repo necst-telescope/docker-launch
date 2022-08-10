@@ -1,10 +1,11 @@
 from unittest.mock import patch
 
-import paramiko
 import pytest
 
 from docker_launch import check_connection
 from docker_launch.ssh import _parse_address
+
+from .conftest import connect
 
 
 def test__parse_address():
@@ -15,17 +16,8 @@ def test__parse_address():
         _parse_address("user@172.29.1.1", "me")
 
 
-def _mock_connect(self, addr, *, username, port):
-    if (addr == "172.29.0.1") and (username == "me") and (port == 22):
-        return
-    else:
-        raise paramiko.AuthenticationException
-
-
-@patch("paramiko.SSHClient.connect", _mock_connect)
+@patch("paramiko.SSHClient.connect", connect)
 def test_check_connection():
-    # paramiko.SSHClient.connect = Mock(side_effect=_mock_connect)
-
     assert check_connection("me@172.29.0.1") is True
     assert check_connection("172.29.0.1", username="me") is True
     assert check_connection("me@172.29.0.1", username="me") is True
