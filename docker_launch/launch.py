@@ -54,14 +54,29 @@ class Containers:
     def stop(self):
         raise NotImplementedError
 
-    def ping(self):
+    def _ping(self):
+        raise NotImplementedError
+
+    def watch(self):
         raise NotImplementedError
 
     @classmethod
     def launch(
         cls, config_path: PathLike, **kwargs
     ) -> List[docker.models.containers.Container]:
-        return cls(config_path).start(**kwargs)
+        """Launch containers described in config_path.
+
+        .. warning::
+
+            To stop all the containers, press Ctrl+C. Killing the process will leave the
+            launched containers unmanaged.
+
+        """
+        containers = cls(config_path).start(**kwargs)
+        try:
+            containers.watch()
+        finally:
+            containers.stop()
 
 
 launch_containers = Containers.launch
