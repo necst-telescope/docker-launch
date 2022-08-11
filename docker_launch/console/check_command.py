@@ -41,7 +41,7 @@ class CheckCommand(Command):
         if private_key_path is None:
             # TODO: Check when only one of (id_rsa, id_rsa.pub) exists, raise error?
             private_key_path = self._generate_default_key()
-            self.info(f"Default key '{private_key_path}' generated.")
+            self.info(f"Default RSA key '{private_key_path}' generated.")
         else:
             self.info(f"Default key '{private_key_path}' found.")
 
@@ -76,12 +76,13 @@ class CheckCommand(Command):
                         "log-in to the shell, which this command doesn't support."
                     )
                     return 3
+                self.line("Unknown error.")
                 return 4
 
         self.line_error(
-            f"Couldn't copy public key to remote host '{address}'.\n", "error"
+            f"Failed to copy public key to remote host '{address}'.\n", "error"
         )
-        return 4
+        return 5
 
     def _get_default_private_key_path(self) -> Optional[Path]:
         # Check if default keys exist or not. Paramiko searches for them by default.
@@ -121,7 +122,6 @@ class CheckCommand(Command):
         public_key_path.write_text(public_key)
         public_key_path.chmod(0o644)
 
-        self.line(f"New RSA key <info>'{private_key_path}'</> generated.")
         return private_key_path
 
     def _get_ssh_error(
