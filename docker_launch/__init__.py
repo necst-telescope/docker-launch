@@ -8,14 +8,13 @@ try:
 except:  # noqa: E722
     __version__ = "0.0.0"
 
-# Aliases
-from .launch import launch_containers  # noqa: F401
-from .ssh import check_key_ssh  # noqa: F401
-
 import logging
 
-
 logger = logging.getLogger("docker-launch")
+
+# Aliases
+from .launch import launch_containers  # noqa: F401, E402
+from .ssh import check_connection  # noqa: F401, E402
 
 
 def check_docker_available():
