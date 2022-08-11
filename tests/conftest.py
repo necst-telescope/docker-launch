@@ -52,10 +52,10 @@ def mock_ssh_connection():
 @pytest.fixture
 def mock_docker_client():
     def LocalhostDockerClient(**kwargs):
-        from docker import DockerClient
+        from docker import DockerClient as OriginalDockerClient
 
         kwargs.update({"base_url": None})
-        return DockerClient(**kwargs)
+        return OriginalDockerClient(**kwargs)
 
     with patch("docker.DockerClient", LocalhostDockerClient):
         yield
