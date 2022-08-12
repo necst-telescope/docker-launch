@@ -124,3 +124,12 @@ def mock_ssh_key_not_locked():
         lambda self, key_path: False,
     ):
         yield
+
+
+@pytest.fixture
+def keyboardinterrupt_on_sleep():
+    def raise_keyboardinterrupt():
+        raise KeyboardInterrupt
+
+    with patch("time.sleep", raise_keyboardinterrupt):
+        yield

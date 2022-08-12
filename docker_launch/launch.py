@@ -1,9 +1,15 @@
+import concurrent.futures
+import time
+from collections import defaultdict
 from ipaddress import ip_address
-from typing import List
+from typing import Any, Dict, List
 
 import docker
 
+from docker_launch import logger
+from . import utils
 from .config_parser import parse
+from .exceptions import LaunchError
 from .ssh import _parse_address
 from .typing import PathLike
 
@@ -34,31 +40,78 @@ def _resolve_base_url(machine: str = None) -> str:
 class Containers:
     def __init__(self, config_path: PathLike) -> None:
         self.config_path = config_path
+        self.containers = defaultdict(lambda: [])
 
-    def start(self, **kwargs) -> List[docker.models.containers.Container]:
+    def _start(
+        self, client: docker.DockerClient, image: str, command: str, **docker_run_kwargs
+    ) -> docker.models.containers.Container:
+        return client.containers.run(image, command, detach=True, **docker_run_kwargs)
+
+    @staticmethod
+    def __flatten(dict_of_lists: Dict[Any, List]) -> List:
+        ret = []
+        _ = [ret.extend(elem) for elem in dict_of_lists.values()]
+        return ret
+
+    @property
+    def containers_list(self) -> List[docker.models.containers.Container]:
+        """List of containers, i.e. not grouped by machines they're running on."""
+        return self.__flatten(self.containers)
+
+    def start(
+        self, **docker_run_kwargs
+    ) -> Dict[str, List[docker.models.containers.Container]]:
+        if len(self.containers_list) > 0:
+            raise LaunchError("This process is already running a launch group.")
+
         config = parse(self.config_path)
 
-        containers = {}
-        for machine, conf in config.items():
-            daemon_url = _resolve_base_url(machine)
-            client = docker.DockerClient(base_url=daemon_url)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
+            futures = []
 
-            img_and_cmd = list(map(lambda x: (x["image"], x["cmd"]), conf))
-            _containers = [
-                client.containers.run(image, command, detach=True, **kwargs)
-                for image, command in img_and_cmd
-            ]  # TODO: Possibly multi-thread?
-            containers[machine] = _containers
-        return containers
+            for machine, conf in config.items():
+                daemon_url = _resolve_base_url(machine)
+                client = docker.DockerClient(base_url=daemon_url)
+                img_and_cmd = list(map(lambda x: (x["image"], x["cmd"]), conf))
+                _futures = [
+                    executor.submit(self._start, client, img, cmd, **docker_run_kwargs)
+                    for img, cmd in img_and_cmd
+                ]
+                futures.append(_futures)
+
+            for machine, future in futures.items():
+                _future = concurrent.futures.as_completed(future, timeout=30)
+                _future = map(lambda x: x.result(), _future)
+                self.containers[machine].extend(_future)
+        return self.containers
 
     def stop(self):
-        raise NotImplementedError
+        for container in self.containers_list:
+            try:
+                container.stop()
+            except Exception:
+                pass
 
-    def _ping(self):
-        raise NotImplementedError
+    def ping(self) -> Dict[str, List[docker.models.containers.Container]]:
+        _ = map(lambda x: x.reload(), self.containers_list)
+        status = list(map(lambda x: x.status, self.containers_list))
+        info = [
+            {"container": c, "status": s}
+            for s, c in zip(status, self.containers_list)
+            if s != "running"
+        ]
+        return utils._groupby(info, "status")
 
     def watch(self):
-        raise NotImplementedError
+        try:
+            while True:
+                not_running = self.ping()
+                if not_running:
+                    logger.info(str(not_running))
+                time.sleep(0.5)
+        except Exception as e:
+            logger.error(e)
+            self.stop()
 
     @classmethod
     def launch(
