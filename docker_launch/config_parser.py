@@ -1,14 +1,14 @@
 import os
 from collections import defaultdict
-from typing import Any, Dict, Hashable, List, Union
+from typing import Dict, Hashable, List, Union
 
 from tomlkit.toml_file import TOMLFile
 
+from . import utils
 from .typing import Literal
 
 
 Substitution = Dict[str, str]
-Object = Dict[Hashable, Any]
 LaunchConfiguration = Dict[Literal["image", "cmd", "machine"], str]
 
 
@@ -19,14 +19,6 @@ def _substitute_command(
         return template.format_map(defaultdict(lambda: "", values))
 
     return [template.format_map(defaultdict(lambda: "", v)) for v in values]
-
-
-def _groupby(objects: List[Object], key: Hashable) -> Dict[str, List[Object]]:
-    grouped = defaultdict(lambda: [])
-    for obj in objects:
-        group_name = obj.get(key, "")
-        grouped[group_name].append(obj)
-    return grouped
 
 
 def parse(config_path: os.PathLike) -> Dict[Hashable, List[LaunchConfiguration]]:
@@ -54,4 +46,4 @@ def parse(config_path: os.PathLike) -> Dict[Hashable, List[LaunchConfiguration]]
             launch_config.append({"image": image, "cmd": command, "machine": machine})
             for command, machine in zip(commands, machines)
         ]
-    return _groupby(launch_config, "machine")
+    return utils._groupby(launch_config, "machine")
