@@ -96,7 +96,7 @@ class TestContainers:
             container.status == "exited"
 
 
-@pytest.skip(reason="No idea how to test this.")
+@pytest.mark.skip(reason="No idea how to test this.")
 @skip_if_docker_not_available
 @config_file_names
 @pytest.mark.usefixtures("mock_docker_client", "keyboardinterrupt_on_sleep")
