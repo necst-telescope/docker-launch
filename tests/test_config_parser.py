@@ -1,6 +1,6 @@
 import pytest
 
-from docker_launch.config_parser import _substitute_command, _groupby, parse
+from docker_launch.config_parser import _substitute_command, parse
 
 
 def test__substitute_command():
@@ -31,18 +31,6 @@ def test__substitute_command():
     assert _substitute_command(
         "ls {a} {b}", [{"a": "-l", "b": "./"}, {"a": "-l", "b": "../"}]
     ) == ["ls -l ./", "ls -l ../"]
-
-
-def test__groupby():
-    assert _groupby([{"k": 1}], "k") == {1: [{"k": 1}]}
-    assert _groupby([{"k": 1, "l": 2}], "k") == {1: [{"k": 1, "l": 2}]}
-    assert _groupby([{"k": 1}, {"k": 1, "l": 2}], "k") == {
-        1: [{"k": 1}, {"k": 1, "l": 2}]
-    }
-    assert _groupby([{"l": 1}, {"k": 1, "l": 2}], "k") == {
-        "": [{"l": 1}],
-        1: [{"k": 1, "l": 2}],
-    }
 
 
 class TestParse:
