@@ -114,9 +114,7 @@ class Containers:
             self.stop()
 
     @classmethod
-    def launch(
-        cls, config_path: PathLike, **kwargs
-    ) -> List[docker.models.containers.Container]:
+    def launch(cls, config_path: PathLike, **kwargs) -> None:
         """Launch containers described in config_path.
 
         .. warning::
