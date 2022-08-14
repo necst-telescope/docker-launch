@@ -42,11 +42,6 @@ class Containers:
         self.config_path = config_path
         self.containers = defaultdict(lambda: [])
 
-    def _start(
-        self, client: docker.DockerClient, image: str, command: str, **docker_run_kwargs
-    ) -> docker.models.containers.Container:
-        return client.containers.run(image, command, detach=True, **docker_run_kwargs)
-
     @staticmethod
     def __flatten(dict_of_lists: Dict[Any, List]) -> List:
         ret = []
@@ -64,20 +59,25 @@ class Containers:
         if len(self.containers_list) > 0:
             raise LaunchError("This process is already running a launch group.")
 
+        def _start(
+            client: docker.DockerClient, image: str, command: str, **kwargs
+        ) -> docker.models.containers.Container:
+            return client.containers.run(image, command, detach=True, **kwargs)
+
         config = parse(self.config_path)
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
-            futures = []
+            futures = {}
 
             for machine, conf in config.items():
                 daemon_url = _resolve_base_url(machine)
                 client = docker.DockerClient(base_url=daemon_url)
                 img_and_cmd = list(map(lambda x: (x["image"], x["cmd"]), conf))
                 _futures = [
-                    executor.submit(self._start, client, img, cmd, **docker_run_kwargs)
+                    executor.submit(_start, client, img, cmd, **docker_run_kwargs)
                     for img, cmd in img_and_cmd
                 ]
-                futures.append(_futures)
+                futures[machine] = _futures
 
             for machine, future in futures.items():
                 _future = concurrent.futures.as_completed(future, timeout=30)
@@ -85,21 +85,41 @@ class Containers:
                 self.containers[machine].extend(_future)
         return self.containers
 
-    def stop(self):
-        for container in self.containers_list:
+    def stop(self) -> None:
+        def _stop(container: docker.models.containers.Container) -> None:
             try:
                 container.stop()
-            except Exception:
-                pass
+                logger.info(f"Container {container} successfully stopped.")
+            except Exception as e:
+                logger.warning(str(e))
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
+            futures = [executor.submit(_stop, c) for c in self.containers_list]
+            _ = concurrent.futures.as_completed(futures, timeout=30)
+
+    def remove(self) -> None:
+        def _remove(container: docker.models.containers.Container) -> None:
+            try:
+                container.remove()
+                logger.info(f"Container {container} successfully removed.")
+            except Exception as e:
+                logger.warning(str(e))
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
+            futures = [executor.submit(_remove, c) for c in self.containers_list]
+            _ = concurrent.futures.as_completed(futures, timeout=30)
 
     def ping(self) -> Dict[str, List[docker.models.containers.Container]]:
-        _ = map(lambda x: x.reload(), self.containers_list)
-        status = list(map(lambda x: x.status, self.containers_list))
-        info = [
-            {"container": c, "status": s}
-            for s, c in zip(status, self.containers_list)
-            if s != "running"
-        ]
+        def _ping(container: docker.models.containers.Container) -> None:
+            container.reload()
+            return container, container.status
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
+            futures = [executor.submit(_ping, c) for c in self.containers_list]
+            futures = concurrent.futures.as_completed(futures, timeout=30)
+
+        result = [f.result() for f in futures]
+        info = [{"container": c, "status": s} for c, s in result if s != "running"]
         return utils._groupby(info, "status")
 
     def watch(self):
