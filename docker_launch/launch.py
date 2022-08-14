@@ -146,11 +146,12 @@ class Containers:
             launched containers unmanaged.
 
         """
-        containers = cls(config_path).start(**kwargs)
+        c = cls(config_path)
+        c.start(**kwargs)
         try:
-            containers.watch()
+            c.watch()
         finally:
-            containers.stop()
+            c.stop()
 
 
 launch_containers = Containers.launch
