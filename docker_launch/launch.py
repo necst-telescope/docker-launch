@@ -93,6 +93,7 @@ class Containers:
             except Exception as e:
                 logger.warning(str(e))
 
+        logger.info("Gracefully stopping containers. This will take ~10s.")
         with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
             futures = [executor.submit(_stop, c) for c in self.containers_list]
             _ = concurrent.futures.as_completed(futures, timeout=30)
