@@ -1,3 +1,4 @@
+import docker
 import pytest
 
 from docker_launch import launch_containers, check_docker_available
@@ -28,16 +29,16 @@ config_file_names = pytest.mark.parametrize(
     "config_file_name",
     [
         "config.toml",
-        pytest.param(
-            "config_include_differentbase.toml",
-            marks=pytest.mark.xfail(reason="Not implemented yet."),
-        ),
-        pytest.param(
-            "config_include_samebase.toml",
-            marks=pytest.mark.xfail(reason="Not implemented yet."),
-        ),
-        "config_multiple_differentbase.toml",
-        "config_multiple_samebase.toml",
+        # pytest.param(
+        #     "config_include_differentbase.toml",
+        #     marks=pytest.mark.xfail(reason="Not implemented yet."),
+        # ),
+        # pytest.param(
+        #     "config_include_samebase.toml",
+        #     marks=pytest.mark.xfail(reason="Not implemented yet."),
+        # ),
+        # "config_multiple_differentbase.toml",
+        # "config_multiple_samebase.toml",
     ],
 )
 
@@ -67,16 +68,27 @@ class TestContainers:
 
     def test_stop(self, sample_dir, config_file_name):
         c = Containers(sample_dir / config_file_name)
-        _ = c.start(remove=True)
+        _ = c.start()
         c.stop()
 
         for container in c.containers_list:
             container.reload()
             assert container.status == "exited"
+            container.remove()
 
-    def test__ping(self, sample_dir, config_file_name):
+    def test_remove(self, sample_dir, config_file_name):
         c = Containers(sample_dir / config_file_name)
-        _ = c.start(remove=True)
+        _ = c.start()
+        c.stop()
+        c.remove()
+
+        for container in c.containers_list:
+            with pytest.raises(docker.errors.NotFound):
+                container.reload()
+
+    def test_ping(self, sample_dir, config_file_name):
+        c = Containers(sample_dir / config_file_name)
+        _ = c.start()
         result = c.ping()
         assert result == {}
 
@@ -85,15 +97,17 @@ class TestContainers:
         assert len(result["exited"]) == 1
 
         c.stop()
+        c.remove()
 
     @pytest.mark.usefixtures("keyboardinterrupt_on_sleep")
     def test_watch(self, sample_dir, config_file_name):
         c = Containers(sample_dir / config_file_name)
-        _ = c.start(remove=True)
+        _ = c.start()
         c.watch()
         for container in c.containers_list:
             container.reload()
             container.status == "exited"
+        c.remove()
 
 
 @pytest.mark.skip(reason="No idea how to test this.")
