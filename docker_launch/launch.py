@@ -53,19 +53,19 @@ class Containers:
         return ret
 
     @property
-    def containers_list(self) -> List[docker.models.containers.Container]:
+    def containers_list(self) -> List[docker.client.ContainerCollection]:
         """List of containers, i.e. not grouped by machines they're running on."""
         return self._flatten(self.containers)
 
     def start(
         self, **docker_run_kwargs
-    ) -> Dict[str, List[docker.models.containers.Container]]:
+    ) -> Dict[str, List[docker.client.ContainerCollection]]:
         if len(self.containers_list) > 0:
             raise LaunchError("This process is already running a launch group.")
 
         def _start(
             client: docker.DockerClient, image: str, command: str, **kwargs
-        ) -> docker.models.containers.Container:
+        ) -> docker.client.ContainerCollection:
             return client.containers.run(image, command, detach=True, **kwargs)
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
@@ -88,7 +88,7 @@ class Containers:
         return self.containers
 
     def stop(self) -> None:
-        def _stop(container: docker.models.containers.Container) -> None:
+        def _stop(container: docker.client.ContainerCollection) -> None:
             try:
                 container.stop()
                 logger.info(f"Container {container} successfully stopped.")
@@ -101,7 +101,7 @@ class Containers:
             _ = concurrent.futures.as_completed(futures, timeout=30)
 
     def remove(self) -> None:
-        def _remove(container: docker.models.containers.Container) -> None:
+        def _remove(container: docker.client.ContainerCollection) -> None:
             try:
                 container.remove()
                 logger.info(f"Container {container} successfully removed.")
@@ -112,8 +112,8 @@ class Containers:
             futures = [executor.submit(_remove, c) for c in self.containers_list]
             _ = concurrent.futures.as_completed(futures, timeout=30)
 
-    def ping(self) -> Dict[str, List[docker.models.containers.Container]]:
-        def _ping(container: docker.models.containers.Container) -> None:
+    def ping(self) -> Dict[str, List[docker.client.ContainerCollection]]:
+        def _ping(container: docker.client.ContainerCollection) -> None:
             container.reload()
             return container, container.status
 
