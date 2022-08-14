@@ -27,6 +27,6 @@ config_file_names = pytest.mark.parametrize(
 
 @pytest.mark.usefixtures("keyboardinterrupt_on_sleep", "mock_docker_client")
 @config_file_names
-def test_up(tester, config_file_name):
-    tester.execute(config_file_name)
+def test_up(tester, sample_dir, config_file_name):
+    tester.execute(str(sample_dir / config_file_name))
     assert tester.status_code == 0
