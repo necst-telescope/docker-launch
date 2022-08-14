@@ -2,13 +2,13 @@ import concurrent.futures
 import time
 from collections import defaultdict
 from ipaddress import ip_address
-from typing import Any, Dict, List
+from typing import Any, Dict, Hashable, List
 
 import docker
 
 from docker_launch import logger
 from . import utils
-from .config_parser import parse
+from .config_parser import LaunchConfiguration, parse
 from .exceptions import LaunchError
 from .ssh import _parse_address
 from .typing import PathLike
@@ -42,8 +42,12 @@ class Containers:
         self.config_path = config_path
         self.containers = defaultdict(lambda: [])
 
+    @property
+    def config(self) -> Dict[Hashable, List[LaunchConfiguration]]:
+        return parse(self.config_path)
+
     @staticmethod
-    def __flatten(dict_of_lists: Dict[Any, List]) -> List:
+    def _flatten(dict_of_lists: Dict[Any, List]) -> List:
         ret = []
         _ = [ret.extend(elem) for elem in dict_of_lists.values()]
         return ret
@@ -51,7 +55,7 @@ class Containers:
     @property
     def containers_list(self) -> List[docker.models.containers.Container]:
         """List of containers, i.e. not grouped by machines they're running on."""
-        return self.__flatten(self.containers)
+        return self._flatten(self.containers)
 
     def start(
         self, **docker_run_kwargs
@@ -64,12 +68,10 @@ class Containers:
         ) -> docker.models.containers.Container:
             return client.containers.run(image, command, detach=True, **kwargs)
 
-        config = parse(self.config_path)
-
         with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
             futures = {}
 
-            for machine, conf in config.items():
+            for machine, conf in self.config.items():
                 daemon_url = _resolve_base_url(machine)
                 client = docker.DockerClient(base_url=daemon_url)
                 img_and_cmd = list(map(lambda x: (x["image"], x["cmd"]), conf))

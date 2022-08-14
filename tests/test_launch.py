@@ -29,16 +29,16 @@ config_file_names = pytest.mark.parametrize(
     "config_file_name",
     [
         "config.toml",
-        # pytest.param(
-        #     "config_include_differentbase.toml",
-        #     marks=pytest.mark.xfail(reason="Not implemented yet."),
-        # ),
-        # pytest.param(
-        #     "config_include_samebase.toml",
-        #     marks=pytest.mark.xfail(reason="Not implemented yet."),
-        # ),
-        # "config_multiple_differentbase.toml",
-        # "config_multiple_samebase.toml",
+        pytest.param(
+            "config_include_differentbase.toml",
+            marks=pytest.mark.xfail(reason="Not implemented yet."),
+        ),
+        pytest.param(
+            "config_include_samebase.toml",
+            marks=pytest.mark.xfail(reason="Not implemented yet."),
+        ),
+        "config_multiple_differentbase.toml",
+        "config_multiple_samebase.toml",
     ],
 )
 
@@ -61,6 +61,7 @@ class TestContainers:
     def test_start(self, sample_dir, config_file_name):
         c = Containers(sample_dir / config_file_name)
         _ = c.start(remove=True)
+        assert len(c.containers_list) == len(c._flatten(c.config))
         for container in c.containers_list:
             container.reload()
             assert container.status == "running"
