@@ -28,10 +28,6 @@ def parse(config_path: os.PathLike) -> Dict[Hashable, List[LaunchConfiguration]]
     if additional_config_files:  # TODO: Implement.
         raise NotImplementedError
 
-    force_single_image_per_machine = config.pop("single_image_per_machine", False)
-    if force_single_image_per_machine:  # TODO: Implement.
-        raise NotImplementedError
-
     groups = [v for v in config.values() if isinstance(v, dict)]
 
     launch_config = []
