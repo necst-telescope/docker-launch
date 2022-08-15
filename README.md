@@ -77,56 +77,55 @@ For the details of the options, see [docker run documentation](https://docs.dock
 
 <details><summary>Options of <code>docker run</code> command which <code>docker-launch</code> command and <code>docker_launch.launch_containers()</code> function doesn't support</summary>
 
-  - `--attach`, `-a`
-  - `--cgroupns`
-  - `--cidfile`
-  - `--detach`, `-d` (always `True`)
-  - `--detach-keys`
-  - `--disable-content-trust`
-  - `--env-file`
-  - `--expose`
-  - `--gpus`
-  - `-h` (use `--hostname` instead)
-  - `--interactive`, `-i`
-  - `--ip`
-  - `--ip6`
-  - `--label-file`
-  - `--link-local-ip`
-  - `--log-driver`
-  - `--log-opt`
-  - `--mount`
-  - `--net`
-  - `--net-alias`
-  - `--network`
-  - `--network-alias`
-  - `--no-healthcheck`
-  - `--pull`
-  - `--sig-proxy`
-  - `--stop-timeout`
-  - `--ulimit`
-  - `-v` (use `--volume` instead)
+- `--attach`, `-a`
+- `--cgroupns`
+- `--cidfile`
+- `--detach`, `-d` (always `True`)
+- `--detach-keys`
+- `--disable-content-trust`
+- `--env-file`
+- `--expose`
+- `--gpus`
+- `-h` (use `--hostname` instead)
+- `--interactive`, `-i`
+- `--ip`
+- `--ip6`
+- `--label-file`
+- `--link-local-ip`
+- `--log-driver`
+- `--log-opt`
+- `--mount`
+- `--net`
+- `--net-alias`
+- `--network`
+- `--network-alias`
+- `--no-healthcheck`
+- `--pull`
+- `--sig-proxy`
+- `--stop-timeout`
+- `--ulimit`
+- `-v` (use `--volume` instead)
 
 </details>
 <details><summary>Options of Docker SDK's <code>docker.containers.run</code> function which <code>docker-launch</code> command doesn't support (<code>docker_launch.launch_containers()</code> function supports them)</summary>
 
-- The following options of Docker SDK's `docker.containers.run` function aren't supported in command line:
-  - `auto_remove`
-  - `device_requests`
-  - `init_path`
-  - `log_config`
-  - `lxc_conf`
-  - `mounts`
-  - `nano_cpus`
-  - `network`
-  - `network_disabled`
-  - `network_mode`
-  - `stdin_open`
-  - `stdout`
-  - `stderr`
-  - `stream`
-  - `ulimits`
-  - `use_config_proxy`
-  - `version`
+- `auto_remove`
+- `device_requests`
+- `init_path`
+- `log_config`
+- `lxc_conf`
+- `mounts`
+- `nano_cpus`
+- `network`
+- `network_disabled`
+- `network_mode`
+- `stdin_open`
+- `stdout`
+- `stderr`
+- `stream`
+- `ulimits`
+- `use_config_proxy`
+- `version`
 
 </details>
 
