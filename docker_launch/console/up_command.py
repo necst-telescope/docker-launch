@@ -173,7 +173,7 @@ class UpCommand(Command):
             "privileged": self.option("privileged"),
             "publish_all_ports": self.option("publish-all"),
             "read_only": self.option("read-only"),
-            "remove": self.option("remove"),
+            "remove": self.option("rm"),
             "restart_policy": self._parse_keyword_mapping(
                 [self.option("restart")], "Name", "MaximumRetryCount"
             ),
@@ -214,23 +214,27 @@ class UpCommand(Command):
 
     @staticmethod
     def _parse_mapping(expr: List[str], sep: str = ":") -> Dict[str, str]:
-        expr_splitted = [e.split(sep, 1) for e in expr]
         try:
+            expr_splitted = [e.split(sep, 1) for e in expr]
             ret = {k: v for k, v in expr_splitted}
             return ret if len(ret) > 0 else None
         except ValueError:
             raise ValueError("Mapping should be given in 'key:value' form")
+        except AttributeError:
+            return None
 
     @staticmethod
     def _parse_keyword_mapping(
         expr: List[str], *keys, sep: str = ":"
     ) -> List[Dict[str, str]]:
-        expr_splitted = [e.split(sep, 1) for e in expr]
         try:
+            expr_splitted = [e.split(sep, 1) for e in expr]
             ret = [{k: v for k, v in zip(keys, e)} for e in expr_splitted]
             return ret if len(ret) > 0 else None
         except ValueError:
             raise ValueError("Mapping should be given in 'key:value' form")
+        except AttributeError:
+            return None
 
     @staticmethod
     def _parse_scattered_mapping(expr: List[str], keys: List[str]) -> Dict[str, str]:
