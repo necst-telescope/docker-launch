@@ -17,8 +17,8 @@ def tmp_project_dir(tmp_path_factory) -> Path:
 
 
 @pytest.mark.skipif(
-    PYTHON_VERSION < (3, 9),
-    PYTHON_VERSION >= (3, 10),
+    PYTHON_VERSION < (3, 10),
+    PYTHON_VERSION >= (3, 11),
     reason="No need to support that wide versions for documentation building",
 )
 def test_create_stub(tmp_project_dir: Path):
@@ -39,6 +39,7 @@ def test_create_stub(tmp_project_dir: Path):
             "-o",
             f"{str(tmp_project_dir)}/docs/_source",
             PKG_NAME,
+            f"{PKG_NAME}/console",
         ],
         capture_output=True,
     )
@@ -46,8 +47,8 @@ def test_create_stub(tmp_project_dir: Path):
 
 
 @pytest.mark.skipif(
-    PYTHON_VERSION < (3, 9),
-    PYTHON_VERSION >= (3, 10),
+    PYTHON_VERSION < (3, 10),
+    PYTHON_VERSION >= (3, 11),
     reason="No need to support that wide versions for documentation building",
 )
 def test_build(tmp_project_dir: Path):
