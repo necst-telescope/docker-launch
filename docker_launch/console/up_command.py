@@ -1,4 +1,3 @@
-from os import stat
 from typing import Dict, List
 
 from cleo import Command
@@ -197,7 +196,7 @@ class UpCommand(Command):
         options = dict(filter(lambda x: x[1] is not None, options.items()))
         self.line(str(options))
 
-        # launch_containers(config_file_path, **options)
+        launch_containers(config_file_path, **options)
         return 0
 
     @staticmethod
