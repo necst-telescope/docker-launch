@@ -1,3 +1,4 @@
+import docker
 import pytest
 
 from docker_launch import launch_containers, check_docker_available
@@ -46,32 +47,73 @@ config_file_names = pytest.mark.parametrize(
 @config_file_names
 @pytest.mark.usefixtures("mock_docker_client")
 class TestContainers:
-    def test_start(self, sample_dir, config_file_name):
+    def test_containers_list(self, sample_dir, config_file_name):
         c = Containers(sample_dir / config_file_name)
         started = c.start(remove=True)
-        print(c, started)
-        for group in started.values():
-            for container in group:
-                container.reload()
-                assert container.status == "running"
-                container.stop()
+        started_flattened = []
+        for containers in started.values():
+            started_flattened.extend(containers)
+        assert c.containers_list == started_flattened
 
-    @pytest.mark.skip(reason="Not implemented yet.")
+        for container in c.containers_list:
+            container.stop()
+
+    def test_start(self, sample_dir, config_file_name):
+        c = Containers(sample_dir / config_file_name)
+        _ = c.start(remove=True)
+        assert len(c.containers_list) == len(c._flatten(c.config))
+        for container in c.containers_list:
+            container.reload()
+            assert container.status == "running"
+            container.stop()
+
     def test_stop(self, sample_dir, config_file_name):
-        _ = Containers(sample_dir / config_file_name)
+        c = Containers(sample_dir / config_file_name)
+        _ = c.start()
+        c.stop()
 
-    @pytest.mark.skip(reason="Not implemented yet.")
-    def test__ping(self, sample_dir, config_file_name):
-        _ = Containers(sample_dir / config_file_name)
+        for container in c.containers_list:
+            container.reload()
+            assert container.status == "exited"
+            container.remove()
 
-    @pytest.mark.skip(reason="Not implemented yet.")
+    def test_remove(self, sample_dir, config_file_name):
+        c = Containers(sample_dir / config_file_name)
+        _ = c.start()
+        c.stop()
+        c.remove()
+
+        for container in c.containers_list:
+            with pytest.raises(docker.errors.NotFound):
+                container.reload()
+
+    def test_ping(self, sample_dir, config_file_name):
+        c = Containers(sample_dir / config_file_name)
+        _ = c.start()
+        result = c.ping()
+        assert result == {}
+
+        c.containers_list[0].stop()
+        result = c.ping()
+        assert len(result["exited"]) == 1
+
+        c.stop()
+        c.remove()
+
+    @pytest.mark.usefixtures("keyboardinterrupt_on_sleep")
     def test_watch(self, sample_dir, config_file_name):
-        _ = Containers(sample_dir / config_file_name)
+        c = Containers(sample_dir / config_file_name)
+        _ = c.start()
+        c.watch()
+        for container in c.containers_list:
+            container.reload()
+            container.status == "exited"
+        c.remove()
 
 
-@pytest.mark.skip(reason="Not implemented yet.")
+@pytest.mark.skip(reason="No idea how to test this.")
 @skip_if_docker_not_available
 @config_file_names
-@pytest.mark.usefixtures("mock_docker_client")
+@pytest.mark.usefixtures("mock_docker_client", "keyboardinterrupt_on_sleep")
 def test_launch_containers(sample_dir, config_file_name):
     _ = launch_containers(sample_dir / config_file_name, remove=True)

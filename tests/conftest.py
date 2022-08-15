@@ -7,8 +7,7 @@ from cleo import Application, CommandTester
 from docker import DockerClient as OriginalDockerClient
 
 from docker_launch.console.check_command import CheckCommand
-
-# from docker_launch.console.up_command import UpCommand
+from docker_launch.console.up_command import UpCommand
 
 
 @pytest.fixture
@@ -20,7 +19,7 @@ def sample_dir():
 def app():
     _app = Application()
     _app.add(CheckCommand())
-    # _app.add(UpCommand())
+    _app.add(UpCommand())
     return _app
 
 
@@ -123,4 +122,13 @@ def mock_ssh_key_not_locked():
         "docker_launch.console.check_command.CheckCommand._check_if_key_is_locked",
         lambda self, key_path: False,
     ):
+        yield
+
+
+@pytest.fixture
+def keyboardinterrupt_on_sleep():
+    def raise_keyboardinterrupt():
+        raise KeyboardInterrupt
+
+    with patch("time.sleep", raise_keyboardinterrupt):
         yield

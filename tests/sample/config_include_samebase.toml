@@ -1,5 +1,4 @@
 include = [ "config.toml" ]
-single_image_per_machine = false
 
 [ros_topics]
 baseimg = "ros:humble-ros-core"

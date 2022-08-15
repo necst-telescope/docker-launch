@@ -1,5 +1,4 @@
 include = []
-single_image_per_machine = false
 
 [ros_topics_1st]
 baseimg = "ros:humble-ros-core"
