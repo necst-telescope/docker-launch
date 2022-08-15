@@ -1,0 +1,7 @@
+docker\_launch.ssh
+==================
+
+.. automodule:: docker_launch.ssh
+   :members:
+   :undoc-members:
+   :show-inheritance:

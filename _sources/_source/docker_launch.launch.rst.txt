@@ -1,0 +1,7 @@
+docker\_launch.launch
+=====================
+
+.. automodule:: docker_launch.launch
+   :members:
+   :undoc-members:
+   :show-inheritance:
