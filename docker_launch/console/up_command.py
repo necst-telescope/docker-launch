@@ -66,6 +66,8 @@ class UpCommand(Command):
             *Swap limit equal to memory plus swap: '-1' to enable unlimited swap}
         {--memory-swappiness=? : *Tune container memory swappiness (0 to 100)}
         {--name=? : *Assign a name to the container}
+        {--net=? : Conenct a container to a network}
+        {--network=? : Connect a container to a network}
         {--oom-kill-disable : *Disable OOM killer}
         {--oom-score-adj=? : *Tune host's OOM preferences (-1000 to 1000)}
         {--pid=? : *PID namespace to use}
@@ -164,6 +166,9 @@ class UpCommand(Command):
             "mem_swappiness": self._parse_int(self.option("memory-swappiness")),
             "memswap_limit": self.option("memory-swap"),
             "name": self.option("name"),
+            "network_mode": self._parse_network(
+                self.option("net"), self.option("network")
+            ),
             "oom_kill_disable": self.option("oom-kill-disable"),
             "oom_score_adj": self._parse_int(self.option("oom-score-adj")),
             "pid_mode": self.option("pid"),
@@ -247,3 +252,13 @@ class UpCommand(Command):
         # TODO: Support (address, port) syntax for host
         ret = {container: int(host) for host, container in expr_splitted}
         return ret if len(ret) > 0 else None
+
+    def _parse_network(self, expr1: str, expr2: str) -> str:
+        supported = ["bridge", "none", "host"]
+        expr = expr1 or expr2
+        if expr in supported:
+            return expr
+        if expr.find(":") != -1:
+            # Might be container:<name|id> format
+            return expr
+        self.line(f"Unsupported network type '{expr}'")
