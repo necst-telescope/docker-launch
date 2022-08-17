@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from cleo import Command
 
@@ -190,7 +190,7 @@ class UpCommand(Command):
             "sysctls": self._parse_mapping(self.option("sysctl")),
             "tmpfs": self._parse_mapping(self.option("tmpfs")),
             "tty": self.option("tty"),
-            "user": self.option("user"),
+            "user": self._parse_int_if_possible(self.option("user")),
             "userns_mode": self.option("userns"),
             "uts_mode": self.option("uts"),
             "volume_driver": self.option("volume-driver"),
@@ -262,3 +262,10 @@ class UpCommand(Command):
             # Might be container:<name|id> format
             return expr
         self.line(f"Unsupported network type '{expr}'")
+
+    @staticmethod
+    def _parse_int_if_possible(expr: str) -> Union[int, str]:
+        try:
+            return int(expr)
+        except (ValueError, TypeError):
+            return expr
