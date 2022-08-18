@@ -256,6 +256,8 @@ class UpCommand(Command):
     def _parse_network(self, expr1: str, expr2: str) -> str:
         supported = ["bridge", "none", "host"]
         expr = expr1 or expr2
+        if expr is None:
+            return None
         if expr in supported:
             return expr
         if expr.find(":") != -1:
