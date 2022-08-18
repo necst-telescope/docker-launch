@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10"]
+        python-version: [3.6, 3.7, 3.8, 3.9, "3.10"]
     env:
       PACKAGE_NAME: docker_launch
     steps:
@@ -29,6 +29,7 @@ jobs:
       - name: Lint by Flake8 
         run: poetry run flake8 tests ${PACKAGE_NAME}
       - name: Format by Black
+        if: ${{ matrix.python-version }} != 3.6
         run: poetry run black --check tests ${PACKAGE_NAME}
       - name: Test by pytest
         run: poetry run pytest -v tests ${PACKAGE_NAME}
