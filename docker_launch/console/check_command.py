@@ -39,7 +39,6 @@ class CheckCommand(Command):
 
         private_key_path = self._get_default_private_key_path()
         if private_key_path is None:
-            # TODO: Check when only one of (id_rsa, id_rsa.pub) exists, raise error?
             private_key_path = self._generate_default_key()
             self.info(f"Default RSA key '{private_key_path}' generated.")
         else:
