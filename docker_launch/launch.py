@@ -124,9 +124,10 @@ class Containers:
 
         def _ping(container: docker.client.ContainerCollection) -> None:
             container.reload()
-            logger.info(
-                container.logs(timestamps=True, since=self.last_ping, until=now)
-            )
+            logs = container.logs(timestamps=True, since=self.last_ping, until=now)
+            if logs:
+                base_url = container.client.api.base_url
+                logger.info(f"{container.short_id}@{base_url} : {logs.decode('utf-8')}")
             return container, container.status
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
