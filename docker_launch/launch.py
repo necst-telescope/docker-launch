@@ -41,7 +41,7 @@ class Containers:
     def __init__(self, config_path: PathLike) -> None:
         self.config_path = config_path
         self.containers = defaultdict(lambda: [])
-        self.last_ping = time.time()
+        self.last_ping = int(time.time())
 
     @property
     def config(self) -> Dict[Hashable, List[LaunchConfiguration]]:
@@ -120,7 +120,7 @@ class Containers:
             _ = concurrent.futures.as_completed(futures, timeout=30)
 
     def ping(self) -> Dict[str, List[docker.client.ContainerCollection]]:
-        now = time.time()
+        now = int(time.time())
 
         def _ping(container: docker.client.ContainerCollection) -> None:
             container.reload()
