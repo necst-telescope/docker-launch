@@ -48,31 +48,37 @@ def test_up_blkio_weight_device():
 
 
 @pytest.mark.usefixtures("keyboardinterrupt_on_sleep", "mock_docker_client")
-def test_up_cap_add(tester, sample_dir):
-    tester.execute(f"{sample_dir / 'config.toml'} --cap-add=SYS_RAWIO --rm")
-    assert tester.status_code == 0
+class TestUpCapAdd:
+    def test_equal(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --cap-add=SYS_RAWIO --rm")
+        assert tester.status_code == 0
 
-    tester.execute(f"{sample_dir / 'config.toml'} --cap-add SYS_RAWIO --rm")
-    assert tester.status_code == 0
+    def test_whitespace(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --cap-add SYS_RAWIO --rm")
+        assert tester.status_code == 0
 
-    tester.execute(
-        f"{sample_dir / 'config.toml'} --cap-add=SYS_RAWIO --cap-add SYS_ADMIN --rm"
-    )
-    assert tester.status_code == 0
+    def test_multiple(self, tester, sample_dir):
+        tester.execute(
+            f"{sample_dir / 'config.toml'} --cap-add=SYS_RAWIO --cap-add SYS_ADMIN --rm"
+        )
+        assert tester.status_code == 0
 
 
 @pytest.mark.usefixtures("keyboardinterrupt_on_sleep", "mock_docker_client")
-def test_up_cap_drop(tester, sample_dir):
-    tester.execute(f"{sample_dir / 'config.toml'} --cap-drop=MKNOD --rm")
-    assert tester.status_code == 0
+class TestUpCapDrop:
+    def test_equal(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --cap-drop=MKNOD --rm")
+        assert tester.status_code == 0
 
-    tester.execute(f"{sample_dir / 'config.toml'} --cap-drop MKNOD --rm")
-    assert tester.status_code == 0
+    def test_whitespace(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --cap-drop MKNOD --rm")
+        assert tester.status_code == 0
 
-    tester.execute(
-        f"{sample_dir / 'config.toml'} --cap-drop=MKNOD --cap-drop SYS_ADMIN --rm"
-    )
-    assert tester.status_code == 0
+    def test_multiple(self, tester, sample_dir):
+        tester.execute(
+            f"{sample_dir / 'config.toml'} --cap-drop=MKNOD --cap-drop SYS_ADMIN --rm"
+        )
+        assert tester.status_code == 0
 
 
 @pytest.mark.skip(reason="Still experimental")
@@ -286,33 +292,39 @@ def test_up_name():
 
 
 @pytest.mark.usefixtures("keyboardinterrupt_on_sleep", "mock_docker_client")
-def test_up_net(tester, sample_dir):
-    tester.execute(f"{sample_dir / 'config.toml'} --net=host --rm")
-    assert tester.status_code == 0
-    assert "Unsupported network type." not in tester.io.fetch_error()
+class TestUpNet:
+    def test_equal(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --net=host --rm")
+        assert tester.status_code == 0
+        assert "Unsupported network type." not in tester.io.fetch_error()
 
-    tester.execute(f"{sample_dir / 'config.toml'} --net host --rm")
-    assert tester.status_code == 0
-    assert "Unsupported network type." not in tester.io.fetch_error()
+    def test_whitespace(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --net host --rm")
+        assert tester.status_code == 0
+        assert "Unsupported network type." not in tester.io.fetch_error()
 
-    tester.execute(f"{sample_dir / 'config.toml'} --net custom --rm")
-    assert tester.status_code == 0
-    assert "Unsupported network type." in tester.io.fetch_error()
+    def test_not_supported(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --net=custom --rm")
+        assert tester.status_code == 0
+        assert "Unsupported network type." in tester.io.fetch_error()
 
 
 @pytest.mark.usefixtures("keyboardinterrupt_on_sleep", "mock_docker_client")
-def test_up_network(tester, sample_dir):
-    tester.execute(f"{sample_dir / 'config.toml'} --network=host --rm")
-    assert tester.status_code == 0
-    assert "Unsupported network type." not in tester.io.fetch_error()
+class TestUpNetwork:
+    def test_equal(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --network=host --rm")
+        assert tester.status_code == 0
+        assert "Unsupported network type." not in tester.io.fetch_error()
 
-    tester.execute(f"{sample_dir / 'config.toml'} --network host --rm")
-    assert tester.status_code == 0
-    assert "Unsupported network type." not in tester.io.fetch_error()
+    def test_whitespace(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --network host --rm")
+        assert tester.status_code == 0
+        assert "Unsupported network type." not in tester.io.fetch_error()
 
-    tester.execute(f"{sample_dir / 'config.toml'} --network custom --rm")
-    assert tester.status_code == 0
-    assert "Unsupported network type." in tester.io.fetch_error()
+    def test_not_supported(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --network=custom --rm")
+        assert tester.status_code == 0
+        assert "Unsupported network type." in tester.io.fetch_error()
 
 
 @pytest.mark.skip(reason="Still experimental")
@@ -413,39 +425,51 @@ def test_up_tty():
 
 
 @pytest.mark.usefixtures("keyboardinterrupt_on_sleep", "mock_docker_client")
-def test_up_user(tester, sample_dir):
-    tester.execute(f"{sample_dir / 'config.toml'} --rm --user=root")
-    assert tester.status_code == 0
-    assert "Group/GID isn't supported." not in tester.io.fetch_error()
-    tester.execute(f"{sample_dir / 'config.toml'} --rm --user root")
-    assert tester.status_code == 0
-    assert "Group/GID isn't supported." not in tester.io.fetch_error()
-    tester.execute(f"{sample_dir / 'config.toml'} --rm -u=root")
-    assert tester.status_code == 0
-    assert "Group/GID isn't supported." not in tester.io.fetch_error()
-    tester.execute(f"{sample_dir / 'config.toml'} --rm -u root")
-    assert tester.status_code == 0
-    assert "Group/GID isn't supported." not in tester.io.fetch_error()
+class TestUpUser:
+    def test_username_long_equal(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm --user=root")
+        assert tester.status_code == 0
+        assert "Group/GID isn't supported." not in tester.io.fetch_error()
 
-    tester.execute(f"{sample_dir / 'config.toml'} --rm --user=root:root")
-    assert tester.status_code == 0
-    assert "Group/GID isn't supported." in tester.io.fetch_error()
+    def test_username_long_whitespace(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm --user root")
+        assert tester.status_code == 0
+        assert "Group/GID isn't supported." not in tester.io.fetch_error()
 
-    tester.execute(f"{sample_dir / 'config.toml'} --rm --user=0")
-    assert tester.status_code == 0
-    assert "Group/GID isn't supported." not in tester.io.fetch_error()
+    def test_username_short_equal(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm -u=root")
+        assert tester.status_code == 0
+        assert "Group/GID isn't supported." not in tester.io.fetch_error()
 
-    tester.execute(f"{sample_dir / 'config.toml'} --rm --user=0:0")
-    assert tester.status_code == 0
-    assert "Group/GID isn't supported." in tester.io.fetch_error()
+    def test_username_short_whitespace(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm -u root")
+        assert tester.status_code == 0
+        assert "Group/GID isn't supported." not in tester.io.fetch_error()
 
-    tester.execute(f"{sample_dir / 'config.toml'} --rm --user=root:0")
-    assert tester.status_code == 0
-    assert "Group/GID isn't supported." in tester.io.fetch_error()
+    def test_username_groupname(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm -u=root:root")
+        assert tester.status_code == 0
+        assert "Group/GID isn't supported." in tester.io.fetch_error()
 
-    tester.execute(f"{sample_dir / 'config.toml'} --rm --user=0:root")
-    assert tester.status_code == 0
-    assert "Group/GID isn't supported." in tester.io.fetch_error()
+    def test_uid(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm -u=0")
+        assert tester.status_code == 0
+        assert "Group/GID isn't supported." not in tester.io.fetch_error()
+
+    def test_uid_gid(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm -u=0:0")
+        assert tester.status_code == 0
+        assert "Group/GID isn't supported." in tester.io.fetch_error()
+
+    def test_username_gid(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm -u=root:0")
+        assert tester.status_code == 0
+        assert "Group/GID isn't supported." in tester.io.fetch_error()
+
+    def test_uid_groupname(self, tester, sample_dir):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm -u=0:root")
+        assert tester.status_code == 0
+        assert "Group/GID isn't supported." in tester.io.fetch_error()
 
 
 @pytest.mark.skip(reason="Still experimental")
@@ -459,35 +483,52 @@ def test_up_uts():
 
 
 @pytest.mark.usefixtures("keyboardinterrupt_on_sleep", "mock_docker_client")
-def test_up_volume(tester, sample_dir, tmp_volume):
-    tester.execute(
-        f"{sample_dir / 'config.toml'} --rm --volume={tmp_volume}:/home/volume"
-    )
-    assert tester.status_code == 0
-    assert "Anonymous volume isn't supported." not in tester.io.fetch_error()
-    tester.execute(
-        f"{sample_dir / 'config.toml'} --rm --volume {tmp_volume}:/home/volume"
-    )
-    assert tester.status_code == 0
-    assert "Anonymous volume isn't supported." not in tester.io.fetch_error()
+class TestUpVolume:
+    def test_equal(self, tester, sample_dir, tmp_volume):
+        tester.execute(
+            f"{sample_dir / 'config.toml'} --rm --volume={tmp_volume}:/home/volume"
+        )
+        assert tester.status_code == 0
+        assert "Anonymous volume isn't supported." not in tester.io.fetch_error()
 
-    tester.execute(
-        f"{sample_dir / 'config.toml'} --rm --volume={tmp_volume}:/home/volume1 "
-        f"--volume {tmp_volume}:/home/volume2"
-    )
-    assert tester.status_code == 0
-    assert "Anonymous volume isn't supported." not in tester.io.fetch_error()
+    def test_whitespace(self, tester, sample_dir, tmp_volume):
+        tester.execute(
+            f"{sample_dir / 'config.toml'} --rm --volume {tmp_volume}:/home/volume"
+        )
+        assert tester.status_code == 0
+        assert "Anonymous volume isn't supported." not in tester.io.fetch_error()
 
-    tester.execute(
-        f"{sample_dir / 'config.toml'} --rm --volume={tmp_volume}:/home/volume:ro"
-    )
-    assert tester.status_code == 0
-    assert "Anonymous volume isn't supported." not in tester.io.fetch_error()
-    tester.execute(
-        f"{sample_dir / 'config.toml'} --rm --volume {tmp_volume}:/home/volume:rw"
-    )
-    assert tester.status_code == 0
-    assert "Anonymous volume isn't supported." not in tester.io.fetch_error()
+    def test_multiple(self, tester, sample_dir, tmp_volume):
+        tester.execute(
+            f"{sample_dir / 'config.toml'} --rm --volume {tmp_volume}:/home/volume1"
+            f"--volume={tmp_volume}:/home/volume2"
+        )
+        assert tester.status_code == 0
+        assert "Anonymous volume isn't supported." not in tester.io.fetch_error()
+
+    def test_option_ro(self, tester, sample_dir, tmp_volume):
+        tester.execute(
+            f"{sample_dir / 'config.toml'} --rm --volume {tmp_volume}:/home/volume:ro"
+        )
+        assert tester.status_code == 0
+        assert "Anonymous volume isn't supported." not in tester.io.fetch_error()
+
+    def test_option_rw(self, tester, sample_dir, tmp_volume):
+        tester.execute(
+            f"{sample_dir / 'config.toml'} --rm --volume {tmp_volume}:/home/volume:rw"
+        )
+        assert tester.status_code == 0
+        assert "Anonymous volume isn't supported." not in tester.io.fetch_error()
+
+    def test_anonymous(self, tester, sample_dir, tmp_volume):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm --volume /home/volume")
+        assert tester.status_code == 0
+        assert "Anonymous volume isn't supported." in tester.io.fetch_error()
+
+    def test_anonymous_with_option(self, tester, sample_dir, tmp_volume):
+        tester.execute(f"{sample_dir / 'config.toml'} --rm --volume /home/volume:rw")
+        assert tester.status_code == 0
+        assert "Anonymous volume isn't supported." in tester.io.fetch_error()
 
 
 @pytest.mark.skip(reason="Still experimental")
