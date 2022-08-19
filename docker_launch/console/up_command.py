@@ -1,8 +1,9 @@
-from typing import Dict, List, Literal, Union
+from typing import Dict, List, Union
 
 from cleo import Command
 
 from ..launch import launch_containers
+from ..typing import Literal
 
 
 class UpCommand(Command):
