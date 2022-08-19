@@ -3,6 +3,7 @@ from typing import Dict, List, Union
 from cleo import Command
 
 from ..launch import launch_containers
+from ..typing import Literal
 
 
 class UpCommand(Command):
@@ -87,10 +88,10 @@ class UpCommand(Command):
         {--sysctl=* : *Sysctl options}
         {--tmpfs=* : *Mount a tmpfs directory}
         {--t|tty : *Allocate a pseudo-TTY}
-        {--u|user=? : *Username or UID (format: <name:uid>[:<group|gid>])}
+        {--u|user=? : Username or UID (format: <name:uid>[:<group|gid>])}
         {--userns=? : *User namespace to use}
         {--uts=? : *UTS namespace to use}
-        {--volume=* : *Bind mount a volume}
+        {--volume=* : Bind mount a volume}
         {--volume-driver=? : *Optional volume driver for the container}
         {--volumes-from=* : *Mount volumes from the specified container(s)}
         {--w|workdir=? : *Working directory inside the container}
@@ -190,16 +191,19 @@ class UpCommand(Command):
             "sysctls": self._parse_mapping(self.option("sysctl")),
             "tmpfs": self._parse_mapping(self.option("tmpfs")),
             "tty": self.option("tty"),
-            "user": self._parse_int_if_possible(self.option("user")),
+            "user": self._parse_user(self.option("user")),
             "userns_mode": self.option("userns"),
             "uts_mode": self.option("uts"),
             "volume_driver": self.option("volume-driver"),
-            "volumes": self._parse_list(self.option("volume")),
+            "volumes": self._parse_volume(self.option("volume")),
             "volumes_from": self.option("volumes-from"),
             "working_dir": self.option("workdir"),
         }
         options = dict(filter(lambda x: x[1] is not None, options.items()))
-        self.line(str(options))
+        self.line("Running with")
+        max_key_len = max([len(k) for k in options.keys()])
+        for k, v in options.items():
+            self.line(f"    {k:{max_key_len}s} : {v}")
 
         launch_containers(config_file_path, **options)
         return 0
@@ -263,7 +267,7 @@ class UpCommand(Command):
         if expr.find(":") != -1:
             # Might be container:<name|id> format
             return expr
-        self.line(f"Unsupported network type '{expr}'")
+        self.line_error(f"Unsupported network type. Ignoring '{expr}'...")
 
     @staticmethod
     def _parse_int_if_possible(expr: str) -> Union[int, str]:
@@ -271,3 +275,46 @@ class UpCommand(Command):
             return int(expr)
         except (ValueError, TypeError):
             return expr
+
+    def _parse_user(self, expr: str) -> Union[int, str]:
+        if expr is None:
+            return None
+
+        expr = expr.lstrip("=")
+        if expr.find(":") != -1:
+            user, group = expr.split(":")
+            self.line_error(f"Group/GID isn't supported. Ignoring '{group}'...")
+            return self._parse_int_if_possible(user)
+        user = expr
+        return self._parse_int_if_possible(user)
+
+    def _parse_volume(
+        self,
+        expr: List[str],
+    ) -> Dict[str, Dict[Literal["bind", "mode"], str]]:
+        def _parse_expr(e: str) -> Dict[Literal["bind", "mode"], str]:
+            args = e.split(":")
+
+            last = args[-1].split(",")[0]
+            if (last in ("ro", "rw")) and (len(args) == 3):
+                host, bind = args[:2]
+                mode = last
+            elif len(args) == 3:
+                self.line_error(f"Unsupported volume mode. Ignoring '{last}'")
+                host, bind = args[:2]
+                mode = "rw"
+            elif (last in ("ro", "rw")) and (len(args) == 2):
+                self.line_error(f"Anonymous volume isn't supported. Ignoring '{e}'")
+                return {}
+            elif len(args) == 2:
+                host, bind = args
+                mode = "rw"
+            else:
+                self.line_error(f"Anonymous volume isn't supported. Ignoring '{e}'")
+                return {}
+            return {host: {"bind": bind, "mode": mode}}
+
+        ret = {}
+        _ = [ret.update(_parse_expr(e)) for e in expr]
+
+        return ret if len(ret) > 0 else None
