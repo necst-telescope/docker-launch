@@ -1,6 +1,7 @@
 import pytest
 
 from docker_launch.config_parser import _substitute_command, parse
+from docker_launch.exceptions import ConfigFileError
 
 
 def test__substitute_command():
@@ -139,10 +140,111 @@ class TestParse:
             ],
         }
 
-    @pytest.mark.skip(reason="Not supported yet.")
     def test_parse_include_samebase(self, sample_dir):
-        assert parse(sample_dir / "config_include_samebase.toml")
+        assert parse(sample_dir / "config_include_samebase.toml") == {
+            "localhost": [
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub first std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": "localhost",
+                },
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub first std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": "localhost",
+                },
+            ],
+            "user@172.29.1.2": [
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub /second std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": "user@172.29.1.2",
+                },
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub /second std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": "user@172.29.1.2",
+                },
+            ],
+            None: [
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub third std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": None,
+                },
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub third std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": None,
+                },
+            ],
+        }
 
-    @pytest.mark.skip(reason="Not supported yet.")
     def test_parse_include_differentbase(self, sample_dir):
-        assert parse(sample_dir / "config_include_differentbase.toml")
+        assert parse(sample_dir / "config_include_differentbase.toml") == {
+            "localhost": [
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub first std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": "localhost",
+                },
+                {
+                    "image": "ros:foxy-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub first std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": "localhost",
+                },
+            ],
+            "user@172.29.1.2": [
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub /second std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": "user@172.29.1.2",
+                },
+                {
+                    "image": "ros:foxy-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub /second std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": "user@172.29.1.2",
+                },
+            ],
+            None: [
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub third std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": None,
+                },
+                {
+                    "image": "ros:foxy-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub third std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": None,
+                },
+            ],
+        }
+
+    def test_not_grouped(self, sample_dir):
+        with pytest.raises(ConfigFileError):
+            parse(sample_dir / "config_not_grouped.toml")
+
+    def test_recursive(self, sample_dir):
+        assert parse(sample_dir / "config_recursive.toml") == {
+            "localhost": [
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub first std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": "localhost",
+                }
+            ],
+            "user@172.29.1.2": [
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub /second std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": "user@172.29.1.2",
+                }
+            ],
+            None: [
+                {
+                    "image": "ros:humble-ros-core",
+                    "cmd": "env ROS_DOMAIN_ID=1 ros2 topic pub third std_msgs/msg/Float64 '{data: 123.45}'",  # noqa: E501
+                    "machine": None,
+                }
+            ],
+        }
