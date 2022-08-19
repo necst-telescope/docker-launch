@@ -283,9 +283,9 @@ class UpCommand(Command):
         if expr.find(":") != -1:
             user, group = expr.split(":")
             self.line_error(f"Group/GID isn't supported. Ignoring '{group}'...")
-            return user
+            return self._parse_int_if_possible(user)
         user = expr
-        return user
+        return self._parse_int_if_possible(user)
 
     def _parse_volume(
         self,
