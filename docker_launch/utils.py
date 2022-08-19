@@ -4,7 +4,7 @@ from typing import Any, Dict, Hashable, List
 Object = Dict[Hashable, Any]
 
 
-def _groupby(objects: List[Object], key: Hashable) -> Dict[str, List[Object]]:
+def _groupby(objects: List[Object], key: Hashable) -> Dict[Hashable, List[Object]]:
     grouped = defaultdict(lambda: [])
     for obj in objects:
         group_name = obj.get(key, "")
