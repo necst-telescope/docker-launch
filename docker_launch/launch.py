@@ -41,6 +41,7 @@ class Containers:
     def __init__(self, config_path: PathLike) -> None:
         self.config_path = config_path
         self.containers = defaultdict(lambda: [])
+        self.last_ping = int(time.time())
 
     @property
     def config(self) -> Dict[Hashable, List[LaunchConfiguration]]:
@@ -66,7 +67,13 @@ class Containers:
         def _start(
             client: docker.DockerClient, image: str, command: str, **kwargs
         ) -> docker.client.ContainerCollection:
-            return client.containers.run(image, command, detach=True, **kwargs)
+            container = client.containers.run(image, command, detach=True, **kwargs)
+            _base_url = client.api.base_url.split("//")[-1]
+            logger.info(
+                f"Container '{container.name}' ({container.short_id}) started "
+                f"on '{_base_url}'"
+            )
+            return container
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
             futures = {}
@@ -113,14 +120,21 @@ class Containers:
             _ = concurrent.futures.as_completed(futures, timeout=30)
 
     def ping(self) -> Dict[str, List[docker.client.ContainerCollection]]:
+        now = int(time.time())
+
         def _ping(container: docker.client.ContainerCollection) -> None:
             container.reload()
+            logs = container.logs(timestamps=True, since=self.last_ping, until=now)
+            if logs:
+                base_url = container.client.api.base_url
+                logger.info(f"{container.short_id}@{base_url} : {logs.decode('utf-8')}")
             return container, container.status
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
             futures = [executor.submit(_ping, c) for c in self.containers_list]
             futures = concurrent.futures.as_completed(futures, timeout=30)
 
+        self.last_ping = now
         result = [f.result() for f in futures]
         info = [{"container": c, "status": s} for c, s in result if s != "running"]
         return utils._groupby(info, "status")
@@ -131,7 +145,7 @@ class Containers:
                 not_running = self.ping()
                 if not_running:
                     logger.info(str(not_running))
-                time.sleep(0.5)
+                time.sleep(1)
         except Exception as e:
             logger.error(e)
             self.stop()

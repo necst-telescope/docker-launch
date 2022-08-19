@@ -46,42 +46,42 @@ class CheckCommand(Command):
 
         public_key_path = private_key_path.with_suffix(".pub")
         ret = self._ssh_copy_id(public_key_path, address)
-        if ret == 0:
-            self.info(f"Successfully copied public key to remote host '{address}'.")
-            if check_connection(address):
-                self.info("Connection OK!")
-                return 0
-            else:
-                if self._get_ssh_error(address) is paramiko.BadHostKeyException:
-                    ipaddr, _ = _parse_address(address)
-                    self.line_error(
-                        f"{address} looks different from what this machine knows it is."
-                    )
-                    self.line(
-                        f"If you know why this happens (e.g. machine at {address} is "
-                        f"replaced), run <comment>ssh keygen -R {ipaddr}</> and retry."
-                    )
-                    return 2
-                self.line_error("Connection failed.", "error")
-                if self._check_if_key_is_locked(private_key_path):
-                    self.info("This error may originates from locked key.\n")
-                    self.line(
-                        "If ssh-agent is running and well configured, the key will be "
-                        "unlocked automatically. Otherwise the connection will fail "
-                        "because Docker doesn't handle passphrase.\n"
-                        "In shells with no 'SSH_AUTH_SOCK' and 'SSH_AGENT_PID' "
-                        "variables set (e.g. shell over SSH), the agent cannot be "
-                        "accessed, so need configuration of the agent every time you "
-                        "log-in to the shell, which this command doesn't support."
-                    )
-                    return 3
-                self.line("Unknown error.")
-                return 4
+        if ret != 0:
+            self.line_error(
+                f"Failed to copy public key to remote host '{address}'.\n", "error"
+            )
+            return 5
 
-        self.line_error(
-            f"Failed to copy public key to remote host '{address}'.\n", "error"
-        )
-        return 5
+        self.info(f"Successfully copied public key to remote host '{address}'.")
+        if check_connection(address):
+            self.info("Connection OK!")
+            return 0
+
+        if self._get_ssh_error(address) is paramiko.BadHostKeyException:
+            ipaddr, _ = _parse_address(address)
+            self.line_error(
+                f"{address} looks different from what this machine knows it is."
+            )
+            self.line(
+                f"If you know why this happens (e.g. machine at {address} is "
+                f"replaced), run <comment>ssh keygen -R {ipaddr}</> and retry."
+            )
+            return 2
+        self.line_error("Connection failed.", "error")
+        if self._check_if_key_is_locked(private_key_path):
+            self.info("This error may originates from locked key.\n")
+            self.line(
+                "If ssh-agent is running and well configured, the key will be "
+                "unlocked automatically. Otherwise the connection will fail "
+                "because Docker doesn't handle passphrase.\n"
+                "In shells with no 'SSH_AUTH_SOCK' and 'SSH_AGENT_PID' "
+                "variables set (e.g. shell over SSH), the agent cannot be "
+                "accessed, so need configuration of the agent every time you "
+                "log-in to the shell, which this command doesn't support."
+            )
+            return 3
+        self.line("Unknown error.")
+        return 4
 
     def _get_default_private_key_path(self) -> Optional[Path]:
         # Check if default keys exist or not. Paramiko searches for them by default.
