@@ -145,7 +145,7 @@ class Containers:
                 not_running = self.ping()
                 if not_running:
                     logger.info(str(not_running))
-                time.sleep(0.5)
+                time.sleep(1)
         except Exception as e:
             logger.error(e)
             self.stop()
