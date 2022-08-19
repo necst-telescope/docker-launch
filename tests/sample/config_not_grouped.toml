@@ -1,0 +1,7 @@
+baseimg = "ros:humble-ros-core"
+command = "env ROS_DOMAIN_ID=1 ros2 topic pub {topic} std_msgs/msg/Float64 '{{data: 123.45}}'"
+targets = [
+    { topic = "first", __machine__ = "localhost" },
+    { topic = "/second", __machine__ = "user@172.29.1.2" },
+    { topic = "third" },
+]
