@@ -11,14 +11,8 @@ config_file_names = pytest.mark.parametrize(
     "config_file_name",
     [
         "config.toml",
-        pytest.param(
-            "config_include_differentbase.toml",
-            marks=pytest.mark.xfail(reason="Not implemented yet."),
-        ),
-        pytest.param(
-            "config_include_samebase.toml",
-            marks=pytest.mark.xfail(reason="Not implemented yet."),
-        ),
+        "config_include_differentbase.toml",
+        "config_include_samebase.toml",
         "config_multiple_differentbase.toml",
         "config_multiple_samebase.toml",
     ],
