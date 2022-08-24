@@ -4,34 +4,41 @@ from docker_launch.config_parser import _substitute_command, parse
 from docker_launch.exceptions import ConfigFileError
 
 
-def test__substitute_command():
-    assert _substitute_command("ls", {}) == "ls"
-    assert _substitute_command("ls", [{}]) == ["ls"]
-    assert _substitute_command("ls", [{}, {}]) == ["ls", "ls"]
+class TestSubstituteCommand:
+    def test_no_placeholder_empty_target(self):
+        assert _substitute_command("ls", {}) == "ls"
+        assert _substitute_command("ls", [{}]) == ["ls"]
+        assert _substitute_command("ls", [{}, {}]) == ["ls", "ls"]
 
-    assert _substitute_command("ls", {"a": "./"}) == "ls"
-    assert _substitute_command("ls", [{"a": "./"}]) == ["ls"]
-    assert _substitute_command("ls", [{"a": "./"}, {"a": "../"}]) == ["ls", "ls"]
+    def test_no_placeholder_redundant_target(self):
+        assert _substitute_command("ls", {"a": "./"}) == "ls"
+        assert _substitute_command("ls", [{"a": "./"}]) == ["ls"]
+        assert _substitute_command("ls", [{"a": "./"}, {"a": "../"}]) == ["ls", "ls"]
 
-    assert _substitute_command("ls {a}", {"a": "./"}) == "ls ./"
-    assert _substitute_command("ls {a}", [{"a": "./"}]) == ["ls ./"]
-    assert _substitute_command("ls {a}", [{"a": "./"}, {"a": "../"}]) == [
-        "ls ./",
-        "ls ../",
-    ]
+    def test_single_substitution(self):
+        assert _substitute_command("ls {a}", {"a": "./"}) == "ls ./"
+        assert _substitute_command("ls {a}", [{"a": "./"}]) == ["ls ./"]
+        assert _substitute_command("ls {a}", [{"a": "./"}, {"a": "../"}]) == [
+            "ls ./",
+            "ls ../",
+        ]
 
-    assert _substitute_command("ls {a} {b}", {"a": "./"}) == "ls ./ "
-    assert _substitute_command("ls {a} {b}", [{"a": "./"}]) == ["ls ./ "]
-    assert _substitute_command("ls {a} {b}", [{"a": "./"}, {"b": "../"}]) == [
-        "ls ./ ",
-        "ls  ../",
-    ]
+    def test_multiple_substitutions_with_missing_key(self):
+        assert _substitute_command("ls {a} {b}", {"a": "./"}) == "ls ./ "
+        assert _substitute_command("ls {a} {b}", [{"a": "./"}]) == ["ls ./ "]
+        assert _substitute_command("ls {a} {b}", [{"a": "./"}, {"b": "../"}]) == [
+            "ls ./ ",
+            "ls  ../",
+        ]
 
-    assert _substitute_command("ls {a} {b}", {"a": "-l", "b": "./"}) == "ls -l ./"
-    assert _substitute_command("ls {a} {b}", [{"a": "-l", "b": "./"}]) == ["ls -l ./"]
-    assert _substitute_command(
-        "ls {a} {b}", [{"a": "-l", "b": "./"}, {"a": "-l", "b": "../"}]
-    ) == ["ls -l ./", "ls -l ../"]
+    def test_multiple_substitutions(self):
+        assert _substitute_command("ls {a} {b}", {"a": "-l", "b": "./"}) == "ls -l ./"
+        assert _substitute_command("ls {a} {b}", [{"a": "-l", "b": "./"}]) == [
+            "ls -l ./"
+        ]
+        assert _substitute_command(
+            "ls {a} {b}", [{"a": "-l", "b": "./"}, {"a": "-l", "b": "../"}]
+        ) == ["ls -l ./", "ls -l ../"]
 
 
 class TestParse:
