@@ -71,7 +71,7 @@ class ConfigFileParser:
     @classmethod
     def parse(cls, config_path: PathLike) -> Dict[Hashable, List[LaunchConfiguration]]:
         parsed = cls(config_path)._parse()
-        return utils._groupby(parsed, "machine")
+        return utils.groupby(parsed, "machine")
 
     def _resolve_path(self, path: PathLike, parent: Path) -> Path:
         return Path(path) if Path(path).is_absolute() else parent / path

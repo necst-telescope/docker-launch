@@ -1,8 +1,14 @@
+"""Start, watch and terminate distributed containers.
+
+Most of launch functionalities involve network communications, so they are run
+concurrently in multi-threads.
+
+"""
+
 import concurrent.futures
 import time
 from collections import defaultdict
-from ipaddress import ip_address
-from typing import Any, Dict, Hashable, List
+from typing import Any, Dict, Hashable, List, Tuple
 
 import docker
 
@@ -10,31 +16,7 @@ from docker_launch import logger
 from . import utils
 from .config_parser import LaunchConfiguration, parse
 from .exceptions import LaunchError
-from .ssh import _parse_address
 from .typing import PathLike
-
-
-def _is_ip_address(address: str) -> bool:
-    if not isinstance(address, str):
-        return False
-
-    try:
-        ip_addr, _ = _parse_address(address)
-        ip_address(ip_addr)
-        return True
-    except ValueError:
-        return False
-
-
-def _resolve_base_url(machine: str = None) -> str:
-    if machine in ["host", "localhost"]:
-        return None
-    if machine is None:
-        # TODO: Possibly be arbitrary host, if load balance can be handled
-        return None
-    if _is_ip_address(machine):
-        return f"ssh://{machine}"
-    raise ValueError(f"Cannot interpret machine specification : '{machine}'")
 
 
 class Containers:
@@ -79,7 +61,7 @@ class Containers:
             futures = {}
 
             for machine, conf in self.config.items():
-                daemon_url = _resolve_base_url(machine)
+                daemon_url = utils.resolve_base_url(machine)
                 client = docker.DockerClient(base_url=daemon_url)
                 img_and_cmd = list(map(lambda x: (x["image"], x["cmd"]), conf))
                 _futures = [
@@ -122,13 +104,19 @@ class Containers:
     def ping(self) -> Dict[str, List[docker.client.ContainerCollection]]:
         now = int(time.time())
 
-        def _ping(container: docker.client.ContainerCollection) -> None:
-            container.reload()
-            logs = container.logs(timestamps=True, since=self.last_ping, until=now)
-            if logs:
-                base_url = container.client.api.base_url
-                logger.info(f"{container.short_id}@{base_url} : {logs.decode('utf-8')}")
-            return container, container.status
+        def _ping(
+            container: docker.client.ContainerCollection,
+        ) -> Tuple[docker.client.ContainerCollection, str]:
+            try:
+                container.reload()
+                logs = container.logs(timestamps=True, since=self.last_ping, until=now)
+                if logs:
+                    base_url = container.client.api.base_url
+                    info = f"{container.short_id}@{base_url} : {logs.decode('utf-8')}"
+                    logger.info(info)
+                return container, container.status
+            except docker.errors.APIError:
+                return container, "not found"
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
             futures = [executor.submit(_ping, c) for c in self.containers_list]
@@ -137,7 +125,7 @@ class Containers:
         self.last_ping = now
         result = [f.result() for f in futures]
         info = [{"container": c, "status": s} for c, s in result if s != "running"]
-        return utils._groupby(info, "status")
+        return utils.groupby(info, "status")
 
     def watch(self):
         try:
