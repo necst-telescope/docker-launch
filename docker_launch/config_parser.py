@@ -1,3 +1,18 @@
+"""Parse and format the configuration.
+
+Check if valid keys are defined in configuration file, optionally import other
+configuration file, then convert a1 - a3 into the list of b1 - b3.
+
+a1. Docker image
+a2. Command template
+a3. Individual container configuration
+
+b1. Docker image
+b2. Full command
+b3. Machine to run the container
+
+"""
+
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -29,8 +44,8 @@ def _substitute_command(template: str, values: List[Substitution]) -> List[str]:
 
 class ConfigFileParser:
 
-    SpecialTopLevelKeys = ["include"]
-    SpecialInTableKeys = ["baseimg", "command", "targets"]
+    SpecialTopLevelKeys: List[str] = ["include"]
+    SpecialInTableKeys: List[str] = ["baseimg", "command", "targets"]
 
     def __init__(self, config_path: PathLike):
         self.config_path = Path(config_path)
@@ -61,37 +76,59 @@ class ConfigFileParser:
     def _resolve_path(self, path: PathLike, parent: Path) -> Path:
         return Path(path) if Path(path).is_absolute() else parent / path
 
-    def _parse(
-        self, path: Path = None, already_parsed: List[Path] = []
-    ) -> List[LaunchConfiguration]:
-        if path is None:
-            path = self.config_path
-            already_parsed = []
-            # XXX: Somehow this list shares its values across instances
+    def _parse(self, path: Path = None) -> List[LaunchConfiguration]:
+        """Parse the config file.
 
-        if path in already_parsed:
-            return {}
-        already_parsed.append(path)
+        INTENTION OF FUNCTION NESTING
+        When a classmethod calls instance member which recursively calls itself, some
+        arguments leak into the other classmethod call. Minimal reproduction is shown
+        below.
 
-        config = self._read(path)
-        self._validate(config)
+        import time
+        class A:
+            @classmethod
+            def a(cls):
+                return cls().b()
+            def b(self, c = []):
+                if len(c) > 2:
+                    return c
+                c.append(time.time())
+                return self.b(c)
+        A.a() is A.a()  # True
 
-        launch_config = []
+        """
 
-        additional_config_files = config.pop("include", [])
-        for _path in additional_config_files:
-            _path = self._resolve_path(_path, path.parent)
-            parsed = self._parse(_path, already_parsed)
-            launch_config.extend(parsed)
+        def __parse(
+            path: Path = None, already_parsed: List[Path] = []
+        ) -> List[LaunchConfiguration]:
+            if path is None:
+                path = self.config_path
 
-        for group in config.values():
-            image = group.get("baseimg", "ubuntu:latest")
-            command_template = group.get("command", "")
-            targets = group.get("targets", [])
+            if path in already_parsed:
+                return []
+            already_parsed.append(path)
 
-            _config = self._generate_config(image, command_template, targets)
-            launch_config.extend(_config)
-        return launch_config
+            config = self._read(path)
+            self._validate(config)
+
+            launch_config = []
+
+            additional_config_files = config.pop("include", [])
+            for _path in additional_config_files:
+                _path = self._resolve_path(_path, path.parent)
+                parsed = __parse(_path, already_parsed)
+                launch_config.extend(parsed)
+
+            for group in config.values():
+                image = group.get("baseimg", "ubuntu:latest")
+                command_template = group.get("command", "")
+                targets = group.get("targets", [])
+
+                _config = self._generate_config(image, command_template, targets)
+                launch_config.extend(_config)
+            return launch_config
+
+        return __parse(path)
 
     def _generate_config(
         self, image: str, command_template: str, targets: List[Substitution]
