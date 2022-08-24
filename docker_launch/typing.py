@@ -7,5 +7,5 @@ except ImportError:
     from typing_extensions import Literal
 
 
-PathLike = Union[os.PathLike, str, bytes]
+PathLike = Union[os.PathLike, str]
 Literal = Literal
