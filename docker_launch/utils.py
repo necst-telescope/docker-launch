@@ -6,6 +6,20 @@ Object = Dict[Hashable, Any]
 
 
 def groupby(objects: List[Object], key: Hashable) -> Dict[Hashable, List[Object]]:
+    """Group list of dictionaries by values of its specific key.
+
+    You can safely specify possibly missing key. See the example below.
+
+    Examples
+    --------
+    >>> groupby([{"a": 1, "b": 2}, {"a": 5, "b": 2}, {"a": 1, "b": 7}], "a")
+    {1: [{"a": 1, "b": 2},  {"a": 1, "b": 7}], 5: [{"a": 5, "b": 2}]}
+    >>> groupby([{"a": 1, "b": 2}, {"b": 2}, {"a": 1, "b": 7}], "a")
+    {"": [{"b": 2}], 1: [{"a": 1, "b": 2}, {"a": 1, "b": 7}]}
+    >>> groupby([{"a": 1, "b": 2}, {"a": 5, "b": 2}, {"a": 1, "b": 7}], "c")
+    {"": [{"a": 1, "b": 2}, {"a": 5, "b": 2}, {"a": 1, "b": 7}]}
+
+    """
     grouped = defaultdict(lambda: [])
     for obj in objects:
         group_name = obj.get(key, "")
@@ -24,10 +38,12 @@ def parse_address(address: str, username: str = None) -> Tuple[str, str]:
 
     Examples
     --------
-    >>> _parse_address("user@172.29.0.0")
+    >>> parse_address("user@172.29.0.0")
     ("172.29.0.0", "user")
-    >>> _parse_address("172.29.0.0", "user")
+    >>> parse_address("172.29.0.0", "user")
     ("172.29.0.0", "user")
+    >>> parse_address("172.29.0.0")
+    ("172.29.0.0", None)
 
     """
     _username, ipaddr = username, address
@@ -40,6 +56,18 @@ def parse_address(address: str, username: str = None) -> Tuple[str, str]:
 
 
 def is_ip_address(address: str) -> bool:
+    """Check if the input is IP address or not.
+
+    Examples
+    --------
+    >>> is_ip_address("172.29.0.0")
+    True
+    >>> is_ip_address("user@172.29.0.0")
+    True
+    >>> is_ip_address("localhost")
+    False
+
+    """
     if not isinstance(address, str):
         return False
 

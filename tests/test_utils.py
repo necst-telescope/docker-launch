@@ -19,6 +19,7 @@ def test_parse_address():
     assert parse_address("172.29.1.1", "user") == ("172.29.1.1", "user")
     assert parse_address("user@172.29.1.1") == ("172.29.1.1", "user")
     assert parse_address("user@172.29.1.1", "user") == ("172.29.1.1", "user")
+    assert parse_address("172.29.1.1") == ("172.29.1.1", None)
     with pytest.raises(ValueError):
         parse_address("user@172.29.1.1", "me")
 
