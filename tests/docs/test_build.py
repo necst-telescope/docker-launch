@@ -10,6 +10,8 @@ PYTHON_VERSION = sys.version_info
 
 PKG_NAME = "docker_launch"
 
+pytestmark = pytest.mark.xdist_group("docs")
+
 
 @pytest.fixture(scope="module")
 def tmp_project_dir(tmp_path_factory) -> Path:
