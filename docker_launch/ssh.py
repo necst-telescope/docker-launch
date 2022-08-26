@@ -1,39 +1,9 @@
-from typing import Tuple
+"""Connection checker."""
 
 import paramiko
 
 from docker_launch import logger
-
-
-def _parse_address(address: str, username: str = None) -> Tuple[str, str]:
-    """Parse IP address, either in format user@ipaddr or separately provided.
-
-    Parameters
-    ----------
-    address
-        IP address or username@ipaddr.
-    username
-        User name.
-
-    Returns
-    -------
-    tuple[str, str]
-        Parsed (IP address, user name).
-
-    Raises
-    ------
-    ValueError
-        If address is given in username@ipaddr format but inconsistent username is given
-        as separate argument.
-
-    """
-    _username, ipaddr = username, address
-    if address.find("@") != -1:
-        _username, ipaddr = address.split("@", 1)
-
-    if (username is not None) and (_username != username):
-        raise ValueError("Inconsistent username.")
-    return (ipaddr, _username)
+from . import utils
 
 
 def _get_ssh_client() -> paramiko.SSHClient:
@@ -52,7 +22,7 @@ def check_connection(
 ) -> bool:
     client = _get_ssh_client()
 
-    ipaddr, username = _parse_address(address, username)
+    ipaddr, username = utils.parse_address(address, username)
     try:
         client.connect(ipaddr, username=username, port=port, timeout=timeout)
         client.close()

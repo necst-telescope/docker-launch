@@ -3,6 +3,13 @@ from pathlib import Path
 import pytest
 from cleo import CommandTester
 
+from docker_launch import check_docker_available
+
+DOCKER_NOT_AVAILABLE = not check_docker_available()
+pytestmark = pytest.mark.skipif(
+    DOCKER_NOT_AVAILABLE, reason="Docker isn't available in this environment."
+)
+
 
 @pytest.fixture
 def tester(command_tester_factory) -> CommandTester:

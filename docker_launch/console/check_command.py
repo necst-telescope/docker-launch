@@ -1,3 +1,30 @@
+"""Check and configure the SSH connection with remote machine.
+
+Docker containers can be spawned on remote hosts when SSH connection with no password
+(i.e. public key authentication) is enabled.
+This restriction isn't that complicated as long as you run Docker-related scripts
+locally.
+
+The story gets troublesome when
+- you run Docker on remote machine through SSH
+- your authentication key is locked with passphrase
+- you're connecting to known address, but different machine than the last time
+
+The cause of the first two is that key authenticator `ssh-agent` cannot be caught from
+remote, even if you're logged in with SSH. This disables public key authentication and
+passphrase auto-locking.
+(If you're using VNC, this won't be the case, you'll enjoy the benefits of `ssh-agent`)
+As a measure for this difficulty, this script uses the default SSH keys only. They're
+automatically searched by `paramiko`, defacto standard package for SSH handling in
+Python.
+
+The last situation arose from security reason. If the identity of remote host is
+different from what's been last time, it may indicate someone impersonating the host.
+Due to such reason, this script won't automatically ignore the connection issue, rather
+provides some hints to resolve it.
+
+"""
+
 import logging
 import subprocess
 from pathlib import Path
@@ -6,7 +33,8 @@ from typing import Optional, Type
 import paramiko
 from cleo import Command
 
-from ..ssh import check_connection, _get_ssh_client, _parse_address
+from .. import utils
+from ..ssh import check_connection, _get_ssh_client
 from ..typing import PathLike
 
 
@@ -14,6 +42,7 @@ SSH_DIR = Path.home() / ".ssh"
 
 
 class CheckCommand(Command):
+    # DO NOT EDIT DOCSTRING IF YOU DON'T KNOW "CLEO"
     """
     Check and configure SSH connection with remote machines
 
@@ -58,7 +87,7 @@ class CheckCommand(Command):
             return 0
 
         if self._get_ssh_error(address) is paramiko.BadHostKeyException:
-            ipaddr, _ = _parse_address(address)
+            ipaddr, _ = utils.parse_address(address)
             self.line_error(
                 f"{address} looks different from what this machine knows it is."
             )
@@ -101,7 +130,7 @@ class CheckCommand(Command):
     def _ssh_copy_id(
         self, pubkey_path: PathLike, address: str, *, username: str = None
     ) -> int:
-        ipaddr, username = _parse_address(address, username)
+        ipaddr, username = utils.parse_address(address, username)
         command = ["ssh-copy-id", "-i", str(pubkey_path), f"{username}@{ipaddr}"]
         with subprocess.Popen(command) as p:
             try:
@@ -126,7 +155,7 @@ class CheckCommand(Command):
     def _get_ssh_error(
         self, address: str, *, username: str = None, port: int = 22, timeout: float = 3
     ) -> Optional[Type[Exception]]:
-        ipaddr, username = _parse_address(address, username)
+        ipaddr, username = utils.parse_address(address, username)
 
         client = _get_ssh_client()
         try:

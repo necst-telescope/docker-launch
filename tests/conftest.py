@@ -1,5 +1,6 @@
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Callable
 from unittest.mock import patch
 
 import pytest
@@ -11,12 +12,12 @@ from docker_launch.console.up_command import UpCommand
 
 
 @pytest.fixture
-def sample_dir():
+def sample_dir() -> Path:
     return Path(__file__).parent / "sample"
 
 
 @pytest.fixture
-def app():
+def app() -> Application:
     _app = Application()
     _app.add(CheckCommand())
     _app.add(UpCommand())
@@ -24,7 +25,7 @@ def app():
 
 
 @pytest.fixture
-def command_tester_factory(app):
+def command_tester_factory(app: Application) -> Callable[[str], CommandTester]:
     def create_tester(command: str):
         command = app.find(command)
         return CommandTester(command)

@@ -10,6 +10,7 @@ except:  # noqa: E722
 
 import logging
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("docker-launch")
 
 # Aliases

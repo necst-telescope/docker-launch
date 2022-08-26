@@ -1,15 +1,6 @@
 import pytest
 
 from docker_launch import check_connection
-from docker_launch.ssh import _parse_address
-
-
-def test__parse_address():
-    assert _parse_address("172.29.1.1", "user") == ("172.29.1.1", "user")
-    assert _parse_address("user@172.29.1.1") == ("172.29.1.1", "user")
-    assert _parse_address("user@172.29.1.1", "user") == ("172.29.1.1", "user")
-    with pytest.raises(ValueError):
-        _parse_address("user@172.29.1.1", "me")
 
 
 @pytest.mark.usefixtures("mock_ssh_connection")

@@ -1,3 +1,17 @@
+"""Spawn containers on networked machines.
+
+The duty of launch service is
+1. start Docker container(s) on local or remote host
+2. watch the status of the containers
+3. terminate all the containers on keyboard interrupt
+
+This launch service is made to behave like `docker run` command, i.e. accepts the same
+options (though the majority of the options are still experimental, so buggy).
+Caution the options are applied to all the containers launched by this command, which
+can be a cause of errors.
+
+"""
+
 from typing import Dict, List, Union
 
 from cleo import Command
@@ -7,6 +21,7 @@ from ..typing import Literal
 
 
 class UpCommand(Command):
+    # DO NOT EDIT DOCSTRING IF YOU DON'T KNOW "CLEO"
     """
     Create and launch docker containers on multiple hosts
 
@@ -96,9 +111,6 @@ class UpCommand(Command):
         {--volumes-from=* : *Mount volumes from the specified container(s)}
         {--w|workdir=? : *Working directory inside the container}
     """
-
-    # All options are globally applied.
-    # Options whose explanation starts with asterisk are experimental, so may be buggy.
 
     def handle(self) -> int:
         config_file_path = self.argument("config")
@@ -208,21 +220,18 @@ class UpCommand(Command):
         launch_containers(config_file_path, **options)
         return 0
 
-    @staticmethod
-    def _parse_int(expr: str) -> int:
+    def _parse_int(self, expr: str) -> int:
         try:
             return int(expr)
         except TypeError:
             return
 
-    @staticmethod
-    def _parse_list(expr: List[str], *additional_expr) -> List[str]:
+    def _parse_list(self, expr: List[str], *additional_expr) -> List[str]:
         for e in additional_expr:
             expr += e
         return expr if len(expr) > 0 else None
 
-    @staticmethod
-    def _parse_mapping(expr: List[str], sep: str = ":") -> Dict[str, str]:
+    def _parse_mapping(self, expr: List[str], sep: str = ":") -> Dict[str, str]:
         try:
             expr_splitted = [e.split(sep, 1) for e in expr]
             ret = {k: v for k, v in expr_splitted}
@@ -232,9 +241,8 @@ class UpCommand(Command):
         except AttributeError:
             return None
 
-    @staticmethod
     def _parse_keyword_mapping(
-        expr: List[str], *keys, sep: str = ":"
+        self, expr: List[str], *keys, sep: str = ":"
     ) -> List[Dict[str, str]]:
         try:
             expr_splitted = [e.split(sep, 1) for e in expr]
@@ -245,13 +253,13 @@ class UpCommand(Command):
         except AttributeError:
             return None
 
-    @staticmethod
-    def _parse_scattered_mapping(expr: List[str], keys: List[str]) -> Dict[str, str]:
+    def _parse_scattered_mapping(
+        self, expr: List[str], keys: List[str]
+    ) -> Dict[str, str]:
         ret = {k: v for k, v in zip(keys, expr)}
         return ret if any([e is not None for e in ret.values()]) else None
 
-    @staticmethod
-    def _parse_ports(expr: List[str]) -> Dict[str, str]:
+    def _parse_ports(self, expr: List[str]) -> Dict[str, str]:
         expr_splitted = [e.rsplit(":", 1) for e in expr]
         # TODO: Support (address, port) syntax for host
         ret = {container: int(host) for host, container in expr_splitted}
@@ -269,8 +277,7 @@ class UpCommand(Command):
             return expr
         self.line_error(f"Unsupported network type. Ignoring '{expr}'...")
 
-    @staticmethod
-    def _parse_int_if_possible(expr: str) -> Union[int, str]:
+    def _parse_int_if_possible(self, expr: str) -> Union[int, str]:
         try:
             return int(expr)
         except (ValueError, TypeError):
