@@ -64,7 +64,7 @@ class Containers:
                 ]
                 futures.extend(_futures)
 
-            _futures = concurrent.futures.as_completed(futures, timeout=30)
+            _futures = concurrent.futures.as_completed(futures, timeout=60)
             _futures = map(lambda x: x.result(), _futures)
             self.containers_list.extend(_futures)
         return self.containers_list
