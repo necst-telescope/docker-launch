@@ -72,12 +72,12 @@ class Containers:
     def stop(self) -> None:
         def _stop(container: docker.client.ContainerCollection) -> None:
             try:
-                container.stop()
-                logger.info(f"Container {container} successfully stopped.")
+                container.stop(timeout=3)  # Escalate to SIGKILL after 3 sec.
+                logger.info(f"Container {container} has stopped.")
             except Exception as e:
                 logger.warning(str(e))
 
-        logger.info("Gracefully stopping containers. This will take ~10s.")
+        logger.info("Gracefully stopping containers, may take time.")
         with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
             futures = [executor.submit(_stop, c) for c in self.containers_list]
             _ = concurrent.futures.as_completed(futures, timeout=30)
