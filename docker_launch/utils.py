@@ -24,7 +24,7 @@ def groupby(objects: List[Object], key: Hashable) -> Dict[Hashable, List[Object]
     for obj in objects:
         group_name = obj.get(key, "")
         grouped[group_name].append(obj)
-    return grouped
+    return dict(grouped)
 
 
 def parse_address(address: str, username: str = None) -> Tuple[str, str]:
