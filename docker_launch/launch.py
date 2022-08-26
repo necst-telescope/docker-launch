@@ -7,7 +7,6 @@ concurrently in multi-threads.
 
 import concurrent.futures
 import time
-from collections import defaultdict
 from typing import Any, Dict, Hashable, List, Tuple
 
 import docker
@@ -22,7 +21,7 @@ from .typing import PathLike
 class Containers:
     def __init__(self, config_path: PathLike) -> None:
         self.config_path = config_path
-        self.containers = defaultdict(lambda: [])
+        self.containers_list = []
         self.last_ping = int(time.time())
 
     @property
@@ -34,11 +33,6 @@ class Containers:
         ret = []
         _ = [ret.extend(elem) for elem in dict_of_lists.values()]
         return ret
-
-    @property
-    def containers_list(self) -> List[docker.client.ContainerCollection]:
-        """List of containers, i.e. not grouped by machines they're running on."""
-        return self._flatten(self.containers)
 
     def start(
         self, **docker_run_kwargs
@@ -58,7 +52,7 @@ class Containers:
             return container
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
-            futures = {}
+            futures = []
 
             for machine, conf in self.config.items():
                 daemon_url = utils.resolve_base_url(machine)
@@ -68,13 +62,12 @@ class Containers:
                     executor.submit(_start, client, img, cmd, **docker_run_kwargs)
                     for img, cmd in img_and_cmd
                 ]
-                futures[machine] = _futures
+                futures.extend(_futures)
 
-            for machine, future in futures.items():
-                _future = concurrent.futures.as_completed(future, timeout=30)
-                _future = map(lambda x: x.result(), _future)
-                self.containers[machine].extend(_future)
-        return self.containers
+            _futures = concurrent.futures.as_completed(futures, timeout=30)
+            _futures = map(lambda x: x.result(), _futures)
+            self.containers_list.extend(_futures)
+        return self.containers_list
 
     def stop(self) -> None:
         def _stop(container: docker.client.ContainerCollection) -> None:

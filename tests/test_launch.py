@@ -26,17 +26,6 @@ config_file_names = pytest.mark.parametrize(
 @config_file_names
 @pytest.mark.usefixtures("mock_docker_client")
 class TestContainers:
-    def test_containers_list(self, sample_dir, config_file_name):
-        c = Containers(sample_dir / config_file_name)
-        started = c.start(remove=True)
-        started_flattened = []
-        for containers in started.values():
-            started_flattened.extend(containers)
-        assert c.containers_list == started_flattened
-
-        for container in c.containers_list:
-            container.stop()
-
     def test_start(self, sample_dir, config_file_name):
         c = Containers(sample_dir / config_file_name)
         _ = c.start(remove=True)
