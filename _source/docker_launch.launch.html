@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>docker_launch.launch &#8212; docker-launch 0.2.0 documentation</title>
+    <title>docker_launch.launch &#8212; docker-launch 0.2.1 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -122,7 +122,7 @@
             <!-- Only show if we have sidebars configured, else just a small margin  -->
             <div class="col-12 col-md-3 bd-sidebar"><!DOCTYPE html>
 <!-- This will display the version of the docs -->
-<p style="text-align: center; font-family: Verdana, sans-serif;">v0.2.0</p><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+<p style="text-align: center; font-family: Verdana, sans-serif;">v0.2.1</p><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -196,13 +196,16 @@
                 
   <section id="module-docker_launch.launch">
 <span id="docker-launch-launch"></span><h1>docker_launch.launch<a class="headerlink" href="#module-docker_launch.launch" title="Permalink to this headline">¶</a></h1>
+<p>Start, watch and terminate distributed containers.</p>
+<p>Most of launch functionalities involve network communications, so they are run
+concurrently in multi-threads.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="docker_launch.launch.Containers">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Containers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/launch.html#Containers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.launch.Containers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>, </em><em>bytes</em><em>]</em>) – </p>
+<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>]</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>None</p>
@@ -212,12 +215,6 @@
 <dt class="sig sig-object py" id="docker_launch.launch.Containers.config">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'image'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cmd'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'machine'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#docker_launch.launch.Containers.config" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="docker_launch.launch.Containers.containers_list">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">containers_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">docker.models.containers.ContainerCollection</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#docker_launch.launch.Containers.containers_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of containers, i.e. not grouped by machines they’re running on.</p>
-</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="docker_launch.launch.Containers.start">
@@ -275,7 +272,7 @@ launched containers unmanaged.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>, </em><em>bytes</em><em>]</em>) – </p>
+<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>]</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>None</p>
@@ -296,7 +293,7 @@ launched containers unmanaged.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>, </em><em>bytes</em><em>]</em>) – </p>
+<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>]</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>None</p>

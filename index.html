@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>docker-launch &#8212; docker-launch 0.2.0 documentation</title>
+    <title>docker-launch &#8212; docker-launch 0.2.1 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -121,7 +121,7 @@
             <!-- Only show if we have sidebars configured, else just a small margin  -->
             <div class="col-12 col-md-3 bd-sidebar"><!DOCTYPE html>
 <!-- This will display the version of the docs -->
-<p style="text-align: center; font-family: Verdana, sans-serif;">v0.2.0</p><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+<p style="text-align: center; font-family: Verdana, sans-serif;">v0.2.1</p><form class="bd-search d-flex align-items-center" action="search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -221,7 +221,7 @@ OK
 </pre></div>
 </div>
 <p>If the authentication hasn’t been set-up, you can configure it via</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-launch check user@192.168.1.1 --setup
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>docker-launch check user@192.168.1.1 --setup
 </pre></div>
 </div>
 <p>Once the authentication is set-up, let’s prepare configuration file <code class="docutils literal notranslate"><span class="pre">path/to/config.toml</span></code></p>
@@ -245,7 +245,7 @@ OK
 </pre></div>
 </div>
 <p>or</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-launch up path/to/config.toml --rm
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>docker-launch up path/to/config.toml --rm
 </pre></div>
 </div>
 <p>For the details of the options, see <a class="reference external" href="https://docs.docker.com/engine/reference/commandline/run/">docker run documentation</a> and <a class="reference external" href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run">Docker SDK’s documentation</a>.</p>
@@ -269,9 +269,9 @@ OK
 <li><p><code class="docutils literal notranslate"><span class="pre">--log-driver</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--log-opt</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--mount</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">--net</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--net</span></code> (only <code class="docutils literal notranslate"><span class="pre">bridge</span></code>, <code class="docutils literal notranslate"><span class="pre">none</span></code>, <code class="docutils literal notranslate"><span class="pre">host</span></code>, and <code class="docutils literal notranslate"><span class="pre">container:&lt;name|id&gt;</span></code> are supported)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--net-alias</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">--network</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--network</span></code> (only <code class="docutils literal notranslate"><span class="pre">bridge</span></code>, <code class="docutils literal notranslate"><span class="pre">none</span></code>, <code class="docutils literal notranslate"><span class="pre">host</span></code>, and <code class="docutils literal notranslate"><span class="pre">container:&lt;name|id&gt;</span></code> are supported)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--network-alias</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--no-healthcheck</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--pull</span></code></p></li>
@@ -292,7 +292,6 @@ OK
 <li><p><code class="docutils literal notranslate"><span class="pre">nano_cpus</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">network</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">network_disabled</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">network_mode</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">stdin_open</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">stdout</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">stderr</span></code></p></li>
@@ -305,7 +304,7 @@ OK
 </section>
 <section id="configuration-file-spec">
 <h2>Configuration File Spec<a class="headerlink" href="#configuration-file-spec" title="Permalink to this headline">¶</a></h2>
-<p>The configuration is described in <a class="reference external" href="https://toml.io/en/">TOML</a> format.<br />
+<p>The configuration is described in <a class="reference external" href="https://toml.io/en/">TOML</a> format.
 Required fields are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">baseimg</span></code> (string) - Name of the image from which the containers are created</p></li>
@@ -340,12 +339,12 @@ Required fields are:</p>
 <span class="p">]</span><span class="w"></span>
 </pre></div>
 </div>
-<p>Following option is to be implemented soon.</p>
+<p>Optional field:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">include</span></code> (array of string) - Paths to additional configuration files</p></li>
 </ul>
 <p>The instruction must be declared at top level (not inside tables).</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">include</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;path/to/other/config.toml&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;path/to/another/config.toml&quot;</span><span class="p">]</span><span class="w"></span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">include</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;path/to/other/config.toml&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/path/to/another/config.toml&quot;</span><span class="p">]</span><span class="w"></span>
 
 <span class="k">[table-name]</span><span class="w"></span>
 <span class="n">baseimg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;docker:image-name&quot;</span><span class="w"></span>

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>docker_launch.utils &#8212; docker-launch 0.2.0 documentation</title>
+    <title>docker_launch.utils &#8212; docker-launch 0.2.1 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -121,7 +121,7 @@
             <!-- Only show if we have sidebars configured, else just a small margin  -->
             <div class="col-12 col-md-3 bd-sidebar"><!DOCTYPE html>
 <!-- This will display the version of the docs -->
-<p style="text-align: center; font-family: Verdana, sans-serif;">v0.2.0</p><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+<p style="text-align: center; font-family: Verdana, sans-serif;">v0.2.1</p><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -195,6 +195,107 @@
                 
   <section id="module-docker_launch.utils">
 <span id="docker-launch-utils"></span><h1>docker_launch.utils<a class="headerlink" href="#module-docker_launch.utils" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="docker_launch.utils.groupby">
+<span class="sig-name descname"><span class="pre">groupby</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/utils.html#groupby"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.utils.groupby" title="Permalink to this definition">¶</a></dt>
+<dd><p>Group list of dictionaries by values of its specific key.</p>
+<p>You can safely specify possibly missing key. See the example below.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">groupby</span><span class="p">([{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">}],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
+<span class="go">{1: [{&quot;a&quot;: 1, &quot;b&quot;: 2},  {&quot;a&quot;: 1, &quot;b&quot;: 7}], 5: [{&quot;a&quot;: 5, &quot;b&quot;: 2}]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupby</span><span class="p">([{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">}],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
+<span class="go">{&quot;&quot;: [{&quot;b&quot;: 2}], 1: [{&quot;a&quot;: 1, &quot;b&quot;: 2}, {&quot;a&quot;: 1, &quot;b&quot;: 7}]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupby</span><span class="p">([{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">}],</span> <span class="s2">&quot;c&quot;</span><span class="p">)</span>
+<span class="go">{&quot;&quot;: [{&quot;a&quot;: 1, &quot;b&quot;: 2}, {&quot;a&quot;: 5, &quot;b&quot;: 2}, {&quot;a&quot;: 1, &quot;b&quot;: 7}]}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>objects</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>Hashable</em><em>, </em><em>Any</em><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>key</strong> (<em>Hashable</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>Dict</em>[<em>Hashable</em>, <em>List</em>[<em>Dict</em>[<em>Hashable</em>, <em>Any</em>]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="docker_launch.utils.parse_address">
+<span class="sig-name descname"><span class="pre">parse_address</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/utils.html#parse_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.utils.parse_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse IP address, either in format <a class="reference external" href="mailto:user&#37;&#52;&#48;ipaddr">user<span>&#64;</span>ipaddr</a> or separately provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If address is given in <a class="reference external" href="mailto:username&#37;&#52;&#48;ipaddr">username<span>&#64;</span>ipaddr</a> format but inconsistent username is given
+    as separate argument.</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>address</strong> (<em>str</em>) – </p></li>
+<li><p><strong>username</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><em>Tuple</em>[str, str]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_address</span><span class="p">(</span><span class="s2">&quot;user@172.29.0.0&quot;</span><span class="p">)</span>
+<span class="go">(&quot;172.29.0.0&quot;, &quot;user&quot;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_address</span><span class="p">(</span><span class="s2">&quot;172.29.0.0&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">)</span>
+<span class="go">(&quot;172.29.0.0&quot;, &quot;user&quot;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parse_address</span><span class="p">(</span><span class="s2">&quot;172.29.0.0&quot;</span><span class="p">)</span>
+<span class="go">(&quot;172.29.0.0&quot;, None)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="docker_launch.utils.is_ip_address">
+<span class="sig-name descname"><span class="pre">is_ip_address</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/utils.html#is_ip_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.utils.is_ip_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the input is IP address or not.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_ip_address</span><span class="p">(</span><span class="s2">&quot;172.29.0.0&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ip_address</span><span class="p">(</span><span class="s2">&quot;user@172.29.0.0&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ip_address</span><span class="p">(</span><span class="s2">&quot;localhost&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>address</strong> (<em>str</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="docker_launch.utils.resolve_base_url">
+<span class="sig-name descname"><span class="pre">resolve_base_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">machine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/utils.html#resolve_base_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.utils.resolve_base_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base URL for Docker client.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_resolve_base_url</span><span class="p">(</span><span class="s2">&quot;user@172.29.0.0&quot;</span><span class="p">)</span>
+<span class="go">&#39;ssh://user@172.29.0.0&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_resolve_base_url</span><span class="p">(</span><span class="s2">&quot;localhost&quot;</span><span class="p">)</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>machine</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>docker_launch.config_parser &#8212; docker-launch 0.2.0 documentation</title>
+    <title>docker_launch.config_parser &#8212; docker-launch 0.2.1 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -122,7 +122,7 @@
             <!-- Only show if we have sidebars configured, else just a small margin  -->
             <div class="col-12 col-md-3 bd-sidebar"><!DOCTYPE html>
 <!-- This will display the version of the docs -->
-<p style="text-align: center; font-family: Verdana, sans-serif;">v0.2.0</p><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+<p style="text-align: center; font-family: Verdana, sans-serif;">v0.2.1</p><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -196,23 +196,32 @@
                 
   <section id="module-docker_launch.config_parser">
 <span id="docker-launch-config-parser"></span><h1>docker_launch.config_parser<a class="headerlink" href="#module-docker_launch.config_parser" title="Permalink to this headline">¶</a></h1>
+<p>Parse and format the configuration.</p>
+<p>Check if valid keys are defined in configuration file, optionally import other
+configuration file, then convert a1 - a3 into the list of b1 - b3.</p>
+<p>a1. Docker image
+a2. Command template
+a3. Individual container configuration</p>
+<p>b1. Docker image
+b2. Full command
+b3. Machine to run the container</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="docker_launch.config_parser.ConfigFileParser">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ConfigFileParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/config_parser.html#ConfigFileParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.config_parser.ConfigFileParser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>, </em><em>bytes</em><em>]</em>) – </p>
+<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>]</em>) – </p>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="docker_launch.config_parser.ConfigFileParser.SpecialTopLevelKeys">
-<span class="sig-name descname"><span class="pre">SpecialTopLevelKeys</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['include']</span></em><a class="headerlink" href="#docker_launch.config_parser.ConfigFileParser.SpecialTopLevelKeys" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SpecialTopLevelKeys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['include']</span></em><a class="headerlink" href="#docker_launch.config_parser.ConfigFileParser.SpecialTopLevelKeys" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="docker_launch.config_parser.ConfigFileParser.SpecialInTableKeys">
-<span class="sig-name descname"><span class="pre">SpecialInTableKeys</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['baseimg',</span> <span class="pre">'command',</span> <span class="pre">'targets']</span></em><a class="headerlink" href="#docker_launch.config_parser.ConfigFileParser.SpecialInTableKeys" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SpecialInTableKeys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['baseimg',</span> <span class="pre">'command',</span> <span class="pre">'targets']</span></em><a class="headerlink" href="#docker_launch.config_parser.ConfigFileParser.SpecialInTableKeys" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -225,7 +234,7 @@
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/config_parser.html#ConfigFileParser.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.config_parser.ConfigFileParser.parse" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>, </em><em>bytes</em><em>]</em>) – </p>
+<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>]</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><em>Dict</em>[<em>Hashable</em>, <em>List</em>[<em>Dict</em>[<em>Literal</em>[‘image’, ‘cmd’, ‘machine’], str]]]</p>
@@ -240,7 +249,7 @@
 <span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#docker_launch.config_parser.parse" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>, </em><em>bytes</em><em>]</em>) – </p>
+<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>]</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><em>Dict</em>[<em>Hashable</em>, <em>List</em>[<em>Dict</em>[<em>Literal</em>[‘image’, ‘cmd’, ‘machine’], str]]]</p>
