@@ -28,7 +28,7 @@ provides some hints to resolve it.
 import logging
 import subprocess
 from pathlib import Path
-from typing import Optional, Type
+from typing import Literal, Optional, Type
 
 import paramiko
 from cleo import Command
@@ -49,6 +49,7 @@ class CheckCommand(Command):
     check
         {address : Machine to check, in user@host format}
         {--s|setup : Set-up the connection if it cannot be established}
+        {--allow-locked : Use default locked SSH key, if exists}
     """
 
     def handle(self) -> int:
@@ -66,7 +67,9 @@ class CheckCommand(Command):
             )
             return 1
 
-        private_key_path = self._get_default_private_key_path()
+        private_key_path = self._get_default_private_key_path(
+            self.option("allow-locked")
+        )
         if private_key_path is None:
             private_key_path = self._generate_default_key()
             self.info(f"Default RSA key '{private_key_path}' generated.")
@@ -112,13 +115,19 @@ class CheckCommand(Command):
         self.line("Unknown error.")
         return 4
 
-    def _get_default_private_key_path(self) -> Optional[Path]:
+    def _get_default_private_key_path(
+        self, allow_locked: bool = False, get_all: bool = False
+    ) -> Optional[Path]:
         # Check if default keys exist or not. Paramiko searches for them by default.
         # https://docs.paramiko.org/en/stable/api/client.html#paramiko.client.SSHClient.connect
         default_keys = ["id_rsa", "id_dsa", "id_ecdsa"]
         for key in default_keys:
-            if (SSH_DIR / key).exists() and (SSH_DIR / (key + ".pub")).exists():
-                return SSH_DIR / key
+            secret = SSH_DIR / key
+            public = SSH_DIR / (key + ".pub")
+            if not (secret.exists() and public.exists()):
+                continue
+            if (not self._check_if_key_is_locked(secret)) or allow_locked:
+                return secret
 
     def _check_if_key_is_locked(self, key_path: PathLike) -> bool:
         try:
@@ -139,12 +148,22 @@ class CheckCommand(Command):
                 return_code = p.wait()
         return return_code
 
-    def _generate_default_key(self, comment: str = "id") -> Path:
-        new_key = paramiko.RSAKey.generate(4096)
+    def generate_default_key(
+        self, comment: str = "id", type_: Literal["rsa", "dsa", "ecdsa"] = "rsa"
+    ) -> Path:
+        type_ = type_.lower()
+        key_generation_config = {
+            "rsa": (paramiko.RSAKey, (4096,)),
+            "dsa": (paramiko.DSSKey, (4096,)),
+            "ecdsa": (paramiko.ECDSAKey, ()),
+        }
+
+        existent = self._get_default_private_key_path(allow_locked=True)
+        new_key = key_generator[type_].generate(*generator_args[type_])
         public_key = f"{new_key.get_name()} {new_key.get_base64()} {comment}"
 
-        private_key_path = SSH_DIR / "id_rsa"
-        public_key_path = SSH_DIR / "id_rsa.pub"
+        private_key_path = SSH_DIR / f"id_{type_}"
+        public_key_path = SSH_DIR / f"id_{type_}.pub"
 
         new_key.write_private_key_file(private_key_path)
         public_key_path.write_text(public_key)
