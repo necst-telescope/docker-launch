@@ -75,15 +75,10 @@ def test_check_fail_noninteractive(tester):
 def test_check_setup_no_key_found_interactive(
     tester, tmp_home_dir_with_no_default_ssh_key
 ):
-    private_key = tmp_home_dir_with_no_default_ssh_key / ".ssh" / "id_rsa"
-    public_key = tmp_home_dir_with_no_default_ssh_key / ".ssh" / "id_rsa.pub"
-    assert not private_key.exists()
-    assert not public_key.exists()
+    ssh_dir = tmp_home_dir_with_no_default_ssh_key / ".ssh"
+    assert len(list(ssh_dir.glob("id_*"))) == 0
 
-    with patch(
-        "docker_launch.console.check_command.SSH_DIR",
-        tmp_home_dir_with_no_default_ssh_key / ".ssh",
-    ):
+    with patch("docker_launch.console.check_command.SSH_DIR", ssh_dir):
         tester.execute("me@172.29.0.1 -s")
 
     assert "Default RSA key" in tester.io.fetch_output()
@@ -94,8 +89,8 @@ def test_check_setup_no_key_found_interactive(
     )
     assert "Connection OK!" in tester.io.fetch_output()
 
-    assert private_key.exists()
-    assert public_key.exists()
+    assert len(list(ssh_dir.glob("id_*[!.pub]"))) == 1
+    assert len(list(ssh_dir.glob("id_*.pub"))) == 1
 
     assert tester.status_code == 0
 
@@ -104,15 +99,13 @@ def test_check_setup_no_key_found_interactive(
 def test_check_setup_only_public_key_found_interactive(
     tester, tmp_home_dir_with_default_ssh_public_key_only
 ):
-    private_key = tmp_home_dir_with_default_ssh_public_key_only / ".ssh" / "id_rsa"
-    public_key = tmp_home_dir_with_default_ssh_public_key_only / ".ssh" / "id_rsa.pub"
+    ssh_dir = tmp_home_dir_with_default_ssh_public_key_only / ".ssh"
+    private_key = ssh_dir / "id_rsa"
+    public_key = ssh_dir / "id_rsa.pub"
     assert not private_key.exists()
     assert public_key.exists()
 
-    with patch(
-        "docker_launch.console.check_command.SSH_DIR",
-        tmp_home_dir_with_default_ssh_public_key_only / ".ssh",
-    ):
+    with patch("docker_launch.console.check_command.SSH_DIR", ssh_dir):
         tester.execute("me@172.29.0.1 -s")
 
     assert (
@@ -121,8 +114,9 @@ def test_check_setup_only_public_key_found_interactive(
     )
     assert "Connection OK!" in tester.io.fetch_output()
 
-    assert private_key.exists()
+    assert not private_key.exists()
     assert public_key.exists()
+    assert len(list(ssh_dir.glob("id_*[!.pub]"))) == 1
 
     assert tester.status_code == 0
 
@@ -131,15 +125,13 @@ def test_check_setup_only_public_key_found_interactive(
 def test_check_setup_only_private_key_found_interactive(
     tester, tmp_home_dir_with_default_ssh_private_key_only
 ):
-    private_key = tmp_home_dir_with_default_ssh_private_key_only / ".ssh" / "id_rsa"
-    public_key = tmp_home_dir_with_default_ssh_private_key_only / ".ssh" / "id_rsa.pub"
+    ssh_dir = tmp_home_dir_with_default_ssh_private_key_only / ".ssh"
+    private_key = ssh_dir / "id_rsa"
+    public_key = ssh_dir / "id_rsa.pub"
     assert private_key.exists()
     assert not public_key.exists()
 
-    with patch(
-        "docker_launch.console.check_command.SSH_DIR",
-        tmp_home_dir_with_default_ssh_private_key_only / ".ssh",
-    ):
+    with patch("docker_launch.console.check_command.SSH_DIR", ssh_dir):
         tester.execute("me@172.29.0.1 -s")
 
     assert (
@@ -149,7 +141,8 @@ def test_check_setup_only_private_key_found_interactive(
     assert "Connection OK!" in tester.io.fetch_output()
 
     assert private_key.exists()
-    assert public_key.exists()
+    assert not public_key.exists()
+    assert len(list(ssh_dir.glob("id_*[!.pub]"))) == 2
 
     assert tester.status_code == 0
 
@@ -158,14 +151,15 @@ def test_check_setup_only_private_key_found_interactive(
 def test_check_setup_default_key_pair_found_interactive(
     tester, tmp_home_dir_with_default_ssh_key_pair
 ):
-    private_key = tmp_home_dir_with_default_ssh_key_pair / ".ssh" / "id_rsa"
-    public_key = tmp_home_dir_with_default_ssh_key_pair / ".ssh" / "id_rsa.pub"
+    ssh_dir = tmp_home_dir_with_default_ssh_key_pair / ".ssh"
+    private_key = ssh_dir / "id_rsa"
+    public_key = ssh_dir / "id_rsa.pub"
     assert private_key.exists()
     assert public_key.exists()
 
-    with patch(
-        "docker_launch.console.check_command.SSH_DIR",
-        tmp_home_dir_with_default_ssh_key_pair / ".ssh",
+    with patch("docker_launch.console.check_command.SSH_DIR", ssh_dir), patch(
+        "docker_launch.console.check_command.CheckCommand._check_if_key_is_locked",
+        lambda self, key: False,
     ):
         tester.execute("me@172.29.0.1 -s")
 
@@ -177,6 +171,7 @@ def test_check_setup_default_key_pair_found_interactive(
 
     assert private_key.exists()
     assert public_key.exists()
+    assert len(list(ssh_dir.glob("id_*[!.pub]"))) == 1
 
     assert tester.status_code == 0
 

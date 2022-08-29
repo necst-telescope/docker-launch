@@ -28,7 +28,7 @@ provides some hints to resolve it.
 import logging
 import subprocess
 from pathlib import Path
-from typing import Literal, Optional, Type
+from typing import List, Optional, Type
 
 import paramiko
 from cleo import Command
@@ -116,25 +116,44 @@ class CheckCommand(Command):
         return 4
 
     def _get_default_private_key_path(
-        self, allow_locked: bool = False, get_all: bool = False
+        self, allow_locked: bool = False
     ) -> Optional[Path]:
+        default_keys = self._get_existent_default_private_key_path()
+        for key in default_keys:
+            if allow_locked or (not self._check_if_key_is_locked(key)):
+                return key
+
+    def _get_existent_default_private_key_path(
+        self, include_incomplete: bool = False
+    ) -> List[Path]:
+        def _exists(private_key_path: Path, pair_only: bool) -> bool:
+            private = private_key_path
+            public = private_key_path.parent / (private_key_path.name + ".pub")
+            return (
+                (private.exists() and public.exists())
+                if pair_only
+                else (private.exists() or public.exists())
+            )
+
         # Check if default keys exist or not. Paramiko searches for them by default.
         # https://docs.paramiko.org/en/stable/api/client.html#paramiko.client.SSHClient.connect
         default_keys = ["id_rsa", "id_dsa", "id_ecdsa"]
-        for key in default_keys:
-            secret = SSH_DIR / key
-            public = SSH_DIR / (key + ".pub")
-            if not (secret.exists() and public.exists()):
-                continue
-            if (not self._check_if_key_is_locked(secret)) or allow_locked:
-                return secret
+        return [
+            SSH_DIR / key
+            for key in default_keys
+            if _exists(SSH_DIR / key, not include_incomplete)
+        ]
 
     def _check_if_key_is_locked(self, key_path: PathLike) -> bool:
-        try:
-            paramiko.RSAKey.from_private_key_file(key_path)
-            return False
-        except paramiko.PasswordRequiredException:
-            return True
+        for key_handler in [paramiko.RSAKey, paramiko.DSSKey, paramiko.ECDSAKey]:
+            try:
+                paramiko.RSAKey.from_private_key_file(key_path)
+                return False
+            except paramiko.PasswordRequiredException:
+                return True
+            except Exception:
+                pass
+        raise ValueError("Unknown key type.")
 
     def _ssh_copy_id(
         self, pubkey_path: PathLike, address: str, *, username: str = None
@@ -148,22 +167,31 @@ class CheckCommand(Command):
                 return_code = p.wait()
         return return_code
 
-    def generate_default_key(
-        self, comment: str = "id", type_: Literal["rsa", "dsa", "ecdsa"] = "rsa"
+    def _generate_default_key(
+        self, comment: str = "generated-by-docker-launch"
     ) -> Path:
-        type_ = type_.lower()
         key_generation_config = {
-            "rsa": (paramiko.RSAKey, (4096,)),
-            "dsa": (paramiko.DSSKey, (4096,)),
-            "ecdsa": (paramiko.ECDSAKey, ()),
+            "id_rsa": (paramiko.RSAKey, (4096,)),
+            "id_dsa": (paramiko.DSSKey, (4096,)),
+            "id_ecdsa": (paramiko.ECDSAKey, ()),
         }
 
-        existent = self._get_default_private_key_path(allow_locked=True)
-        new_key = key_generator[type_].generate(*generator_args[type_])
+        existent = self._get_existent_default_private_key_path(include_incomplete=True)
+        existent_types = [path.name for path in existent]
+        new_key_type = set(key_generation_config.keys()) - set(existent_types)
+        if len(new_key_type) < 1:
+            raise FileExistsError(
+                f"Default keys {list(key_generation_config.keys())} already exist. "
+                "Consider using/unlocking them or remove unused one."
+            )
+        new_key_name = new_key_type.pop()
+
+        key_generator, args = key_generation_config[new_key_name]
+        new_key = key_generator.generate(*args)
         public_key = f"{new_key.get_name()} {new_key.get_base64()} {comment}"
 
-        private_key_path = SSH_DIR / f"id_{type_}"
-        public_key_path = SSH_DIR / f"id_{type_}.pub"
+        private_key_path = SSH_DIR / new_key_name
+        public_key_path = SSH_DIR / f"{new_key_name}.pub"
 
         new_key.write_private_key_file(private_key_path)
         public_key_path.write_text(public_key)
