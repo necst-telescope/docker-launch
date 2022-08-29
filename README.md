@@ -40,7 +40,7 @@ OK
 If the authentication hasn't been set-up, you can configure it via
 
 ```shell
-$ docker-launch check user@192.168.1.1 --setup
+docker-launch check user@192.168.1.1 --setup
 ```
 
 Once the authentication is set-up, let's prepare configuration file `path/to/config.toml`
@@ -70,7 +70,7 @@ by running
 or
 
 ```shell
-$ docker-launch up path/to/config.toml --rm
+docker-launch up path/to/config.toml --rm
 ```
 
 For the details of the options, see [docker run documentation](https://docs.docker.com/engine/reference/commandline/run/) and [Docker SDK's documentation](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run).
@@ -95,9 +95,9 @@ For the details of the options, see [docker run documentation](https://docs.dock
 - `--log-driver`
 - `--log-opt`
 - `--mount`
-- `--net`
+- `--net` (only `bridge`, `none`, `host`, and `container:<name|id>` are supported)
 - `--net-alias`
-- `--network`
+- `--network` (only `bridge`, `none`, `host`, and `container:<name|id>` are supported)
 - `--network-alias`
 - `--no-healthcheck`
 - `--pull`
@@ -118,7 +118,6 @@ For the details of the options, see [docker run documentation](https://docs.dock
 - `nano_cpus`
 - `network`
 - `network_disabled`
-- `network_mode`
 - `stdin_open`
 - `stdout`
 - `stderr`
@@ -131,7 +130,7 @@ For the details of the options, see [docker run documentation](https://docs.dock
 
 ## Configuration File Spec
 
-The configuration is described in [TOML](https://toml.io/en/) format.  
+The configuration is described in [TOML](https://toml.io/en/) format.
 Required fields are:
 
 - `baseimg` (string) - Name of the image from which the containers are created
@@ -170,14 +169,14 @@ targets = [
 ]
 ```
 
-Following option is to be implemented soon.
+Optional field:
 
 - `include` (array of string) - Paths to additional configuration files
 
 The instruction must be declared at top level (not inside tables).
 
 ```toml
-include = ["path/to/other/config.toml", "path/to/another/config.toml"]
+include = ["path/to/other/config.toml", "/path/to/another/config.toml"]
 
 [table-name]
 baseimg = "docker:image-name"
