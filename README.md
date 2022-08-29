@@ -169,14 +169,14 @@ targets = [
 ]
 ```
 
-Following option is to be implemented soon.
+Optional field:
 
 - `include` (array of string) - Paths to additional configuration files
 
 The instruction must be declared at top level (not inside tables).
 
 ```toml
-include = ["path/to/other/config.toml", "path/to/another/config.toml"]
+include = ["path/to/other/config.toml", "/path/to/another/config.toml"]
 
 [table-name]
 baseimg = "docker:image-name"
