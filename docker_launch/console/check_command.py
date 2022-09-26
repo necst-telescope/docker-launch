@@ -172,7 +172,7 @@ class CheckCommand(Command):
     ) -> Path:
         key_generation_config = {
             "id_rsa": (paramiko.RSAKey, (4096,)),
-            "id_dsa": (paramiko.DSSKey, (4096,)),
+            "id_dsa": (paramiko.DSSKey, (3072,)),
             "id_ecdsa": (paramiko.ECDSAKey, ()),
         }
 
