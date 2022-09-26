@@ -15,7 +15,7 @@ logger = logging.getLogger("docker-launch")
 
 # Aliases
 from .launch import launch_containers  # noqa: F401, E402
-from .ssh import check_connection  # noqa: F401, E402
+from .connection import check_connection  # noqa: F401, E402
 
 
 def check_docker_available():

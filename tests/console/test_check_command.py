@@ -78,10 +78,10 @@ def test_check_setup_no_key_found_interactive(
     ssh_dir = tmp_home_dir_with_no_default_ssh_key / ".ssh"
     assert len(list(ssh_dir.glob("id_*"))) == 0
 
-    with patch("docker_launch.console.check_command.SSH_DIR", ssh_dir):
+    with patch("docker_launch.ssh.SSH_DIR", ssh_dir):
         tester.execute("me@172.29.0.1 -s")
 
-    assert "Default RSA key" in tester.io.fetch_output()
+    assert "Default key" in tester.io.fetch_output()
     assert "generated." in tester.io.fetch_output()
     assert (
         "Successfully copied public key to remote host 'me@172.29.0.1'."
@@ -105,7 +105,7 @@ def test_check_setup_only_public_key_found_interactive(
     assert not private_key.exists()
     assert public_key.exists()
 
-    with patch("docker_launch.console.check_command.SSH_DIR", ssh_dir):
+    with patch("docker_launch.ssh.SSH_DIR", ssh_dir):
         tester.execute("me@172.29.0.1 -s")
 
     assert (
@@ -131,7 +131,7 @@ def test_check_setup_only_private_key_found_interactive(
     assert private_key.exists()
     assert not public_key.exists()
 
-    with patch("docker_launch.console.check_command.SSH_DIR", ssh_dir):
+    with patch("docker_launch.ssh.SSH_DIR", ssh_dir):
         tester.execute("me@172.29.0.1 -s")
 
     assert (
@@ -157,9 +157,8 @@ def test_check_setup_default_key_pair_found_interactive(
     assert private_key.exists()
     assert public_key.exists()
 
-    with patch("docker_launch.console.check_command.SSH_DIR", ssh_dir), patch(
-        "docker_launch.console.check_command.CheckCommand._check_if_key_is_locked",
-        lambda self, key: False,
+    with patch("docker_launch.ssh.SSH_DIR", ssh_dir), patch(
+        "docker_launch.ssh.is_locked", lambda key: False
     ):
         tester.execute("me@172.29.0.1 -s")
 
@@ -183,8 +182,7 @@ def test_check_setup_identity_changed_interactive(
     tester, tmp_home_dir_with_default_ssh_key_pair
 ):
     with patch(
-        "docker_launch.console.check_command.SSH_DIR",
-        tmp_home_dir_with_default_ssh_key_pair / ".ssh",
+        "docker_launch.ssh.SSH_DIR", tmp_home_dir_with_default_ssh_key_pair / ".ssh"
     ):
         tester.execute("me@172.29.0.1 -s")
 
@@ -197,8 +195,7 @@ def test_check_setup_locked_key_interactive(
     tester, tmp_home_dir_with_default_ssh_key_pair
 ):
     with patch(
-        "docker_launch.console.check_command.SSH_DIR",
-        tmp_home_dir_with_default_ssh_key_pair / ".ssh",
+        "docker_launch.ssh.SSH_DIR", tmp_home_dir_with_default_ssh_key_pair / ".ssh"
     ):
         tester.execute("me@172.29.0.1 -s")
 
@@ -211,8 +208,7 @@ def test_check_setup_unknown_failure_interactive(
     tester, tmp_home_dir_with_default_ssh_key_pair
 ):
     with patch(
-        "docker_launch.console.check_command.SSH_DIR",
-        tmp_home_dir_with_default_ssh_key_pair / ".ssh",
+        "docker_launch.ssh.SSH_DIR", tmp_home_dir_with_default_ssh_key_pair / ".ssh"
     ):
         tester.execute("me@172.29.0.1 -s")
 

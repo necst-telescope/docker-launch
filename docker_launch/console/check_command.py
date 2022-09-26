@@ -26,16 +26,13 @@ provides some hints to resolve it.
 """
 
 import logging
-import subprocess
 from pathlib import Path
-from typing import List, Optional, Type
 
 import paramiko
 from cleo import Command
 
-from .. import utils
-from ..ssh import check_connection, _get_ssh_client
-from ..typing import PathLike
+from .. import ssh, utils
+from ..connection import check_connection
 
 
 SSH_DIR = Path.home() / ".ssh"
@@ -67,17 +64,15 @@ class CheckCommand(Command):
             )
             return 1
 
-        private_key_path = self._get_default_private_key_path(
-            self.option("allow-locked")
-        )
+        private_key_path = ssh.get_default_key_path(self.option("allow-locked"))
         if private_key_path is None:
-            private_key_path = self._generate_default_key()
-            self.info(f"Default RSA key '{private_key_path}' generated.")
+            private_key_path = ssh.generate_default_key()
+            self.info(f"Default key '{private_key_path}' generated.")
         else:
             self.info(f"Default key '{private_key_path}' found.")
 
         public_key_path = private_key_path.with_suffix(".pub")
-        ret = self._ssh_copy_id(public_key_path, address)
+        ret = ssh.ssh_copy_id(public_key_path, address)
         if ret != 0:
             self.line_error(
                 f"Failed to copy public key to remote host '{address}'.\n", "error"
@@ -89,7 +84,7 @@ class CheckCommand(Command):
             self.info("Connection OK!")
             return 0
 
-        if self._get_ssh_error(address) is paramiko.BadHostKeyException:
+        if ssh.get_ssh_error(address) is paramiko.BadHostKeyException:
             ipaddr, _ = utils.parse_address(address)
             self.line_error(
                 f"{address} looks different from what this machine knows it is."
@@ -100,7 +95,7 @@ class CheckCommand(Command):
             )
             return 2
         self.line_error("Connection failed.", "error")
-        if self._check_if_key_is_locked(private_key_path):
+        if ssh.is_locked(private_key_path):
             self.info("This error may originates from locked key.\n")
             self.line(
                 "If ssh-agent is running and well configured, the key will be "
@@ -114,100 +109,3 @@ class CheckCommand(Command):
             return 3
         self.line("Unknown error.")
         return 4
-
-    def _get_default_private_key_path(
-        self, allow_locked: bool = False
-    ) -> Optional[Path]:
-        default_keys = self._get_existent_default_private_key_path()
-        for key in default_keys:
-            if allow_locked or (not self._check_if_key_is_locked(key)):
-                return key
-
-    def _get_existent_default_private_key_path(
-        self, include_incomplete: bool = False
-    ) -> List[Path]:
-        def _exists(private_key_path: Path, pair_only: bool) -> bool:
-            private = private_key_path
-            public = private_key_path.parent / (private_key_path.name + ".pub")
-            return (
-                (private.exists() and public.exists())
-                if pair_only
-                else (private.exists() or public.exists())
-            )
-
-        # Check if default keys exist or not. Paramiko searches for them by default.
-        # https://docs.paramiko.org/en/stable/api/client.html#paramiko.client.SSHClient.connect
-        default_keys = ["id_rsa", "id_dsa", "id_ecdsa"]
-        return [
-            SSH_DIR / key
-            for key in default_keys
-            if _exists(SSH_DIR / key, not include_incomplete)
-        ]
-
-    def _check_if_key_is_locked(self, key_path: PathLike) -> bool:
-        for key_handler in [paramiko.RSAKey, paramiko.DSSKey, paramiko.ECDSAKey]:
-            try:
-                paramiko.RSAKey.from_private_key_file(key_path)
-                return False
-            except paramiko.PasswordRequiredException:
-                return True
-            except Exception:
-                pass
-        raise ValueError("Unknown key type.")
-
-    def _ssh_copy_id(
-        self, pubkey_path: PathLike, address: str, *, username: str = None
-    ) -> int:
-        ipaddr, username = utils.parse_address(address, username)
-        command = ["ssh-copy-id", "-i", str(pubkey_path), f"{username}@{ipaddr}"]
-        with subprocess.Popen(command) as p:
-            try:
-                return_code = p.wait()
-            except KeyboardInterrupt:
-                return_code = p.wait()
-        return return_code
-
-    def _generate_default_key(
-        self, comment: str = "generated-by-docker-launch"
-    ) -> Path:
-        key_generation_config = {
-            "id_rsa": (paramiko.RSAKey, (4096,)),
-            "id_dsa": (paramiko.DSSKey, (3072,)),
-            "id_ecdsa": (paramiko.ECDSAKey, ()),
-        }
-
-        existent = self._get_existent_default_private_key_path(include_incomplete=True)
-        existent_types = [path.name for path in existent]
-        new_key_type = set(key_generation_config.keys()) - set(existent_types)
-        if len(new_key_type) < 1:
-            raise FileExistsError(
-                f"Default keys {list(key_generation_config.keys())} already exist. "
-                "Consider using/unlocking them or remove unused one."
-            )
-        new_key_name = new_key_type.pop()
-
-        key_generator, args = key_generation_config[new_key_name]
-        new_key = key_generator.generate(*args)
-        public_key = f"{new_key.get_name()} {new_key.get_base64()} {comment}"
-
-        private_key_path = SSH_DIR / new_key_name
-        public_key_path = SSH_DIR / f"{new_key_name}.pub"
-
-        new_key.write_private_key_file(private_key_path)
-        public_key_path.write_text(public_key)
-        public_key_path.chmod(0o644)
-
-        return private_key_path
-
-    def _get_ssh_error(
-        self, address: str, *, username: str = None, port: int = 22, timeout: float = 3
-    ) -> Optional[Type[Exception]]:
-        ipaddr, username = utils.parse_address(address, username)
-
-        client = _get_ssh_client()
-        try:
-            client.connect(ipaddr, port=port, username=username, timeout=timeout)
-            client.close()
-            return
-        except Exception as e:
-            return e.__class__
