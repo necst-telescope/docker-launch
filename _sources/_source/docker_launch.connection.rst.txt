@@ -1,0 +1,7 @@
+docker\_launch.connection
+=========================
+
+.. automodule:: docker_launch.connection
+   :members:
+   :undoc-members:
+   :show-inheritance:

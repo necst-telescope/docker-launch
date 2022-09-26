@@ -24,6 +24,7 @@ Submodules
 .. autosummary::
 
    docker_launch.config_parser
+   docker_launch.connection
    docker_launch.exceptions
    docker_launch.launch
    docker_launch.ssh
@@ -36,6 +37,7 @@ Submodules
    :hidden:
 
    docker_launch.config_parser
+   docker_launch.connection
    docker_launch.exceptions
    docker_launch.launch
    docker_launch.ssh

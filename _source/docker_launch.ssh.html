@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>docker_launch.ssh &#8212; docker-launch 0.2.1 documentation</title>
+    <title>docker_launch.ssh &#8212; docker-launch 0.2.2 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -122,7 +122,7 @@
             <!-- Only show if we have sidebars configured, else just a small margin  -->
             <div class="col-12 col-md-3 bd-sidebar"><!DOCTYPE html>
 <!-- This will display the version of the docs -->
-<p style="text-align: center; font-family: Verdana, sans-serif;">v0.2.1</p><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+<p style="text-align: center; font-family: Verdana, sans-serif;">v0.2.2</p><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -131,6 +131,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="docker_launch.config_parser.html">
    docker_launch.config_parser
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="docker_launch.connection.html">
+   docker_launch.connection
   </a>
  </li>
  <li class="toctree-l1">
@@ -196,10 +201,65 @@
                 
   <section id="module-docker_launch.ssh">
 <span id="docker-launch-ssh"></span><h1>docker_launch.ssh<a class="headerlink" href="#module-docker_launch.ssh" title="Permalink to this headline">¶</a></h1>
-<p>Connection checker.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="docker_launch.ssh.check_connection">
-<span class="sig-name descname"><span class="pre">check_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">22</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/ssh.html#check_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.ssh.check_connection" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="docker_launch.ssh.get_default_key_path">
+<span class="sig-name descname"><span class="pre">get_default_key_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_locked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/ssh.html#get_default_key_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.ssh.get_default_key_path" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>allow_locked</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>Optional</em>[<em>Path</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="docker_launch.ssh.is_locked">
+<span class="sig-name descname"><span class="pre">is_locked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/ssh.html#is_locked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.ssh.is_locked" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key_path</strong> (<em>Path</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="docker_launch.ssh.ssh_copy_id">
+<span class="sig-name descname"><span class="pre">ssh_copy_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pubkey_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/ssh.html#ssh_copy_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.ssh.ssh_copy_id" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pubkey_path</strong> (<em>Union</em><em>[</em><em>PathLike</em><em>, </em><em>str</em><em>]</em>) – </p></li>
+<li><p><strong>address</strong> (<em>str</em>) – </p></li>
+<li><p><strong>username</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="docker_launch.ssh.generate_default_key">
+<span class="sig-name descname"><span class="pre">generate_default_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'generated-by-docker-launch'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/ssh.html#generate_default_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.ssh.generate_default_key" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>comment</strong> (<em>str</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>Path</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="docker_launch.ssh.get_ssh_error">
+<span class="sig-name descname"><span class="pre">get_ssh_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">22</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/ssh.html#get_ssh_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.ssh.get_ssh_error" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -210,7 +270,7 @@
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>bool</p>
+<dd class="field-even"><p><em>Optional</em>[<em>Type</em>[Exception]]</p>
 </dd>
 </dl>
 </dd></dl>

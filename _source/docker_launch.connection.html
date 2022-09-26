@@ -4,8 +4,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>docker_launch &#8212; docker-launch 0.2.2 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>docker_launch.connection &#8212; docker-launch 0.2.2 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -35,6 +36,8 @@
     <link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/106944387?s=400&amp;u=ddc959411de05d65ed4a64cc8b871d20a05ce395&amp;v=4"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="docker_launch.exceptions" href="docker_launch.exceptions.html" />
+    <link rel="prev" title="docker_launch.config_parser" href="docker_launch.config_parser.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -75,8 +78,8 @@
  </a>
 </li>
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../_source/docker_launch.html">
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="docker_launch.html">
   API Reference
  </a>
 </li>
@@ -124,7 +127,44 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
-    
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="docker_launch.config_parser.html">
+   docker_launch.config_parser
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   docker_launch.connection
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="docker_launch.exceptions.html">
+   docker_launch.exceptions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="docker_launch.launch.html">
+   docker_launch.launch
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="docker_launch.ssh.html">
+   docker_launch.ssh
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="docker_launch.typing.html">
+   docker_launch.typing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="docker_launch.utils.html">
+   docker_launch.utils
+  </a>
+ </li>
+</ul>
+
   </div>
 </nav>
             </div>
@@ -133,6 +173,20 @@
 
           
           <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
             
           </div>
           
@@ -145,46 +199,49 @@
               
               <div>
                 
-  <h1>Source code for docker_launch</h1><div class="highlight"><pre>
-<span></span><span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">importlib.metadata</span> <span class="kn">import</span> <span class="n">version</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">importlib_metadata</span> <span class="kn">import</span> <span class="n">version</span>
+  <section id="module-docker_launch.connection">
+<span id="docker-launch-connection"></span><h1>docker_launch.connection<a class="headerlink" href="#module-docker_launch.connection" title="Permalink to this headline">¶</a></h1>
+<p>Connection checker.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="docker_launch.connection.check_connection">
+<span class="sig-name descname"><span class="pre">check_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">22</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/docker_launch/connection.html#check_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#docker_launch.connection.check_connection" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>address</strong> (<em>str</em>) – </p></li>
+<li><p><strong>username</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+<li><p><strong>port</strong> (<em>int</em>) – </p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="n">version</span><span class="p">(</span><span class="s2">&quot;docker-launch&quot;</span><span class="p">)</span>
-<span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.0&quot;</span>
+</section>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-
-<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;docker-launch&quot;</span><span class="p">)</span>
-
-<span class="c1"># Aliases</span>
-<span class="kn">from</span> <span class="nn">.launch</span> <span class="kn">import</span> <span class="n">launch_containers</span>  <span class="c1"># noqa: F401, E402</span>
-<span class="kn">from</span> <span class="nn">.connection</span> <span class="kn">import</span> <span class="n">check_connection</span>  <span class="c1"># noqa: F401, E402</span>
-
-
-<div class="viewcode-block" id="check_docker_available"><a class="viewcode-back" href="../_source/docker_launch.html#docker_launch.check_docker_available">[docs]</a><span class="k">def</span> <span class="nf">check_docker_available</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">docker</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">docker</span><span class="o">.</span><span class="n">DockerClient</span><span class="p">()</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">except</span> <span class="n">docker</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DockerException</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
-
-
-<span class="k">if</span> <span class="ow">not</span> <span class="n">check_docker_available</span><span class="p">():</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Docker isn&#39;t available in this environment.&quot;</span><span class="p">)</span>
-</pre></div>
 
               </div>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'>
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="docker_launch.config_parser.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">docker_launch.config_parser</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="docker_launch.exceptions.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">docker_launch.exceptions</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
               
           </main>

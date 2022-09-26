@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>docker_launch.exceptions &#8212; docker-launch 0.2.2 documentation</title>
+    <title>docker_launch.connection &#8212; docker-launch 0.2.2 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -145,17 +145,42 @@
               
               <div>
                 
-  <h1>Source code for docker_launch.exceptions</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="LaunchError"><a class="viewcode-back" href="../../_source/docker_launch.exceptions.html#docker_launch.exceptions.LaunchError">[docs]</a><span></span><span class="k">class</span> <span class="nc">LaunchError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Errors related to launch service.&quot;&quot;&quot;</span>
+  <h1>Source code for docker_launch.connection</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Connection checker.&quot;&quot;&quot;</span>
 
-    <span class="k">pass</span></div>
+<span class="kn">import</span> <span class="nn">paramiko</span>
+
+<span class="kn">from</span> <span class="nn">docker_launch</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
 
 
-<div class="viewcode-block" id="ConfigFileError"><a class="viewcode-back" href="../../_source/docker_launch.exceptions.html#docker_launch.exceptions.ConfigFileError">[docs]</a><span class="k">class</span> <span class="nc">ConfigFileError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Errors related to configuration file content.&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_get_ssh_client</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">paramiko</span><span class="o">.</span><span class="n">SSHClient</span><span class="p">:</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">paramiko</span><span class="o">.</span><span class="n">SSHClient</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">load_system_host_keys</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Host key file found, but it may be corrupted.&quot;</span><span class="p">)</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">set_missing_host_key_policy</span><span class="p">(</span><span class="n">paramiko</span><span class="o">.</span><span class="n">AutoAddPolicy</span><span class="p">())</span>
 
-    <span class="k">pass</span></div>
+    <span class="k">return</span> <span class="n">client</span>
+
+
+<div class="viewcode-block" id="check_connection"><a class="viewcode-back" href="../../_source/docker_launch.connection.html#docker_launch.connection.check_connection">[docs]</a><span class="k">def</span> <span class="nf">check_connection</span><span class="p">(</span>
+    <span class="n">address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">22</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">_get_ssh_client</span><span class="p">()</span>
+
+    <span class="n">ipaddr</span><span class="p">,</span> <span class="n">username</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">parse_address</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ipaddr</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Cannot establish SSH connection with &#39;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">ipaddr</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">Use ``docker-launch check`` to debug this.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
 </pre></div>
 
               </div>
