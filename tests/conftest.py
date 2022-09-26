@@ -62,9 +62,7 @@ def mock_docker_client():
 
 @pytest.fixture
 def mock_ssh_copy_id_pass():
-    with patch(
-        "docker_launch.console.check_command.CheckCommand._ssh_copy_id", lambda *args: 0
-    ):
+    with patch("docker_launch.ssh.ssh_copy_id", lambda *args: 0):
         yield
 
 
@@ -110,19 +108,13 @@ def mock_ssh_copy_id_has_no_effect_identity_changed(mock_ssh_copy_id_pass):
 
 @pytest.fixture
 def mock_ssh_key_locked():
-    with patch(
-        "docker_launch.console.check_command.CheckCommand._check_if_key_is_locked",
-        lambda self, key_path: True,
-    ):
+    with patch("docker_launch.ssh.is_locked", lambda key_path: True):
         yield
 
 
 @pytest.fixture
 def mock_ssh_key_not_locked():
-    with patch(
-        "docker_launch.console.check_command.CheckCommand._check_if_key_is_locked",
-        lambda self, key_path: False,
-    ):
+    with patch("docker_launch.ssh.is_locked", lambda key_path: False):
         yield
 
 

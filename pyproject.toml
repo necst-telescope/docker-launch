@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docker-launch"
-version = "0.2.1"
+version = "0.2.2"
 description = "Create and launch docker containers on multiple hosts."
 license = "MIT"
 readme = "README.md"
